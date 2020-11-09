@@ -1,0 +1,5 @@
+*.om
+__pycache__
+kernel_meta
+*.bin
+.ipynb_checkpoints
