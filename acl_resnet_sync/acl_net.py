@@ -25,7 +25,6 @@ def check_ret(message, ret):
         raise Exception("{} failed ret={}"
                         .format(message, ret))
 
-
 class Net(object):
     def __init__(self, device_id, model_path):
         self.device_id = device_id      # int
@@ -124,20 +123,24 @@ class Net(object):
                 self.output_data.append({"buffer": temp_buffer,
                                          "size": temp_buffer_size})
 
-    def _data_interaction(self, dataset, policy=ACL_MEMCPY_HOST_TO_DEVICE):
+    def _data_interaction(self, dataset, policy=ACL_MEMCPY_DEVICE_TO_DEVICE):
+        
         temp_data_buffer = self.input_data \
-            if policy == ACL_MEMCPY_HOST_TO_DEVICE \
+            if len(dataset) != 0 \
             else self.output_data
-        if len(dataset) == 0 and policy == ACL_MEMCPY_DEVICE_TO_HOST:
-            for item in self.output_data:
-                temp, ret = acl.rt.malloc_host(item["size"])
-                if ret != 0:
-                    raise Exception("can't malloc_host ret={}".format(ret))
-                dataset.append({"size": item["size"], "buffer": temp})
-
+#         print(temp_data_buffer, self.output_data)
+        
+#         if len(dataset) == 0 and policy == ACL_MEMCPY_DEVICE_TO_DEVICE:
+#             print("In this IF")
+#             for item in self.output_data:
+#                 temp, ret = acl.rt.malloc(item["size"], ACL_MEM_MALLOC_NORMAL_ONLY)
+#                 if ret != 0:
+#                     raise Exception("can't malloc_host ret={}".format(ret))
+#                 dataset.append({"size": item["size"], "buffer": temp})
+#         return
         for i in range(len(temp_data_buffer)):
             item = temp_data_buffer[i]
-            if policy == ACL_MEMCPY_HOST_TO_DEVICE:
+            if len(dataset) != 0:
                 ptr = acl.util.numpy_to_ptr(dataset[i])
                 ret = acl.rt.memcpy(item["buffer"],
                                     item["size"],
@@ -147,13 +150,15 @@ class Net(object):
                 check_ret("acl.rt.memcpy", ret)
 
             else:
-                ptr = dataset[i]["buffer"]
-                ret = acl.rt.memcpy(ptr,
-                                    item["size"],
-                                    item["buffer"],
-                                    item["size"],
-                                    policy)
-                check_ret("acl.rt.memcpy", ret)
+                dataset.append(item)
+#                 ptr = dataset[i]["buffer"]
+#                 ret = acl.rt.memcpy(ptr,
+#                                     item["size"],
+#                                     item["buffer"],
+#                                     item["size"],
+#                                     policy)
+#                 check_ret("acl.rt.memcpy", ret)
+#         print(dataset)
 
     def _destory_dataset_and_databuf(self, dataset):
         data_buf_num = acl.mdl.get_dataset_num_buffers(dataset)
@@ -192,7 +197,7 @@ class Net(object):
     def _data_from_host_to_device(self, images):
         print("data interaction from host to device")
         # copy images to device
-        self._data_interaction(images, ACL_MEMCPY_HOST_TO_DEVICE)
+        self._data_interaction(images)
         # load input data into model
         self._gen_dataset("in")
         # load output data into model
@@ -203,7 +208,7 @@ class Net(object):
         print("data interaction from device to host")
         res = []
         # copy device to host
-        self._data_interaction(res, ACL_MEMCPY_DEVICE_TO_HOST)
+        self._data_interaction(res)
         result = self.get_result(res)
         self._print_result(result)
         print("data interaction from device to host success")
