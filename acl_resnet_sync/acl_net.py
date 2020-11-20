@@ -289,7 +289,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=int, default=0)
     parser.add_argument('--model_path', type=str,
-                        default="./model/resnet50.om")
+                        default="./model/resnet50_aipp.om")
     parser.add_argument('--images_path', type=str, default="./data")
     args = parser.parse_args()
     print("Using device id:{}\nmodel path:{}\nimages path:{}"
