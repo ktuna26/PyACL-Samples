@@ -10,7 +10,7 @@ import argparse
 import acl
 from PIL import Image
 from constant import ACL_MEMCPY_HOST_TO_DEVICE, ACL_ERROR_NONE, \
-    IMG_EXT
+        IMG_EXT, ACL_MEMCPY_DEVICE_TO_DEVICE
 from acl_model import Model, check_ret
 from acl_dvpp import Dvpp
 from acl_op import SingleOp
@@ -83,13 +83,14 @@ class Sample(object):
         img = np.fromfile(img_path, dtype=dtype)
         img_ptr = acl.util.numpy_to_ptr(img)
         img_buffer_size = img.itemsize * img.size
+        
         img_device, ret = acl.media.dvpp_malloc(img_buffer_size)
         check_ret("acl.media.dvpp_malloc", ret)
         ret = acl.rt.memcpy(img_device,
                             img_buffer_size,
                             img_ptr,
                             img_buffer_size,
-                            ACL_MEMCPY_HOST_TO_DEVICE)
+                            ACL_MEMCPY_DEVICE_TO_DEVICE)
         check_ret("acl.rt.memcpy", ret)
 
         # ret = acl.rt.free_host(img_ptr)
