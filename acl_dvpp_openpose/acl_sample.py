@@ -13,7 +13,6 @@ from constant import ACL_MEMCPY_HOST_TO_DEVICE, ACL_ERROR_NONE, \
         IMG_EXT, ACL_MEMCPY_DEVICE_TO_DEVICE
 from acl_model import Model, check_ret
 from acl_dvpp import Dvpp
-from acl_op import SingleOp
 
 
 class Sample(object):
@@ -44,9 +43,7 @@ class Sample(object):
         self.dvpp_process = Dvpp(self.stream,
                                  model_input_width,
                                  model_input_height)
-
-        self.sing_op = SingleOp(self.stream)
-
+        
     def __del__(self):
         if self.model_process:
             del self.model_process
