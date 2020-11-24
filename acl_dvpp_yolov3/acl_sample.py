@@ -10,10 +10,9 @@ import argparse
 import acl
 from PIL import Image
 from constant import ACL_MEMCPY_HOST_TO_DEVICE, ACL_ERROR_NONE, \
-    IMG_EXT, ACL_MEMCPY_DEVICE_TO_DEVICE
+        IMG_EXT, ACL_MEMCPY_DEVICE_TO_DEVICE
 from acl_model import Model, check_ret
 from acl_dvpp import Dvpp
-from acl_op import SingleOp
 
 
 class Sample(object):
@@ -32,8 +31,6 @@ class Sample(object):
         self.model_desc = None          # pointer when using
         self.load_input_dataset = None
         self.load_output_dataset = None
-        self.input_dataset = None
-        self.output_dataset = None
         self.init_resource()
 
         self._model_input_width = model_input_width
@@ -46,18 +43,13 @@ class Sample(object):
         self.dvpp_process = Dvpp(self.stream,
                                  model_input_width,
                                  model_input_height)
-
-        self.sing_op = SingleOp(self.stream)
-
+        
     def __del__(self):
         if self.model_process:
             del self.model_process
 
         if self.dvpp_process:
             del self.dvpp_process
-
-        if self.sing_op:
-            del self.sing_op
 
         if self.stream:
             acl.rt.destroy_stream(self.stream)
@@ -66,7 +58,7 @@ class Sample(object):
             acl.rt.destroy_context(self.context)
         acl.rt.reset_device(self.device_id)
         acl.finalize()
-        print("[Sample] class Samle release source success")
+        print("[Sample] class Sample release source success")
 
     def init_resource(self):
         print("[Sample] init resource stage:")
@@ -85,6 +77,7 @@ class Sample(object):
         img = np.fromfile(img_path, dtype=dtype)
         img_ptr = acl.util.numpy_to_ptr(img)
         img_buffer_size = img.itemsize * img.size
+        
         img_device, ret = acl.media.dvpp_malloc(img_buffer_size)
         check_ret("acl.media.dvpp_malloc", ret)
         ret = acl.rt.memcpy(img_device,
@@ -106,7 +99,7 @@ class Sample(object):
         print("[Sample] width:{} height:{}".format(width, height))
         print("[Sample] image:{}".format(img_path))
         img_device, img_buffer_size = self._transfer_to_devicce(img_path, img_dict["dtype"])
-
+        print("[Sample] img_buffer_size:{}".format(img_buffer_size))
         # decode and resize
         dvpp_output_buffer, dvpp_output_size = \
             self.dvpp_process.run(img_device,
