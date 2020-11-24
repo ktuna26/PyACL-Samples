@@ -52,7 +52,7 @@ class Dvpp():
 
         if self._resize_out_dev:
             acl.media.dvpp_free(self._resize_out_dev)
-        print("[Dvpp] class Dvpp exist success")
+        print("[Dvpp] class Dvpp exits successfully")
 
     def init_resource(self):
         self._dvpp_channel_desc = acl.media.dvpp_create_channel_desc()

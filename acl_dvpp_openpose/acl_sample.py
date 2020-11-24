@@ -51,9 +51,6 @@ class Sample(object):
         if self.dvpp_process:
             del self.dvpp_process
 
-        if self.sing_op:
-            del self.sing_op
-
         if self.stream:
             acl.rt.destroy_stream(self.stream)
 
@@ -61,7 +58,7 @@ class Sample(object):
             acl.rt.destroy_context(self.context)
         acl.rt.reset_device(self.device_id)
         acl.finalize()
-        print("[Sample] class Samle release source success")
+        print("[Sample] class Sample release source success")
 
     def init_resource(self):
         print("[Sample] init resource stage:")

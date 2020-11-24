@@ -27,7 +27,8 @@ class Model(object):
         self.input_data = None
         self.output_data = None
         self.model_desc = None          # pointer when using
-
+        self.input_dataset = None
+        self.output_dataset = None
         self.init_resource()
 
     def __del__(self):
@@ -40,7 +41,7 @@ class Model(object):
             ret = acl.mdl.destroy_desc(self.model_desc)
             check_ret("acl.mdl.destroy_desc", ret)
 
-        print("[Model] class Model release source success")
+        print("[Model] class Model releases resources successfully")
 
     def init_resource(self):
         print("[Model] class Model init resource stage:")
@@ -110,6 +111,7 @@ class Model(object):
         print("[Model] create model input dataset success")
 
     def _release_dataset(self, ):
+        
         for dataset in [self.input_dataset, self.output_data]:
             if not dataset:
                 continue
