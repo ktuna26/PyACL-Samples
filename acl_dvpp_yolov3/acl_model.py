@@ -9,7 +9,7 @@ import struct
 import numpy as np
 from constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
     ACL_MEMCPY_HOST_TO_DEVICE, ACL_MEMCPY_DEVICE_TO_HOST, \
-    ACL_ERROR_NONE, NPY_BYTE
+    ACL_ERROR_NONE, NPY_BYTE, ACL_MEMCPY_DEVICE_TO_DEVICE
 from acl_util import check_ret
 
 
@@ -60,6 +60,14 @@ class Model(object):
             print("model output dims", acl.mdl.get_output_dims(self.model_desc, i))
             print("model output datatype", acl.mdl.get_output_data_type(self.model_desc, i))
         
+        input_size = acl.mdl.get_num_inputs(self.model_desc)
+        print("=" * 25)
+        print("model input size", input_size)
+        for i in range(input_size):
+            print("input ", i)
+            print("model input dims", acl.mdl.get_input_dims(self.model_desc, i))
+            print("model input datatype", acl.mdl.get_input_data_type(self.model_desc, i))
+        
         self._gen_output_dataset(output_size)
         print("[Model] class Model init resource stage success")
 
@@ -108,6 +116,18 @@ class Model(object):
         if ret:
             ret = acl.destroy_data_buffer(self.input_dataset)
             check_ret("acl.destroy_data_buffer", ret)
+           
+        img_info, ret = acl.rt.malloc(4 * 4, ACL_MEM_MALLOC_NORMAL_ONLY)
+        check_ret("acl.rt.malloc", ret)
+        ret = acl.rt.memcpy(img_info, 16, \
+                      acl.util.numpy_to_ptr(np.array([416, 416, 576, 768], dtype=np.float32)), \
+                      16, \
+                      ACL_MEMCPY_HOST_TO_DEVICE)
+        check_ret("acl.rt.memcpy", ret)
+        imginfo_dataset_buffer = acl.create_data_buffer(img_info, 16)
+        _, ret = acl.mdl.add_dataset_buffer(self.input_dataset, imginfo_dataset_buffer)
+        check_ret("acl.mdl.add_dataset_buffer", ret)
+        
         print("[Model] create model input dataset success")
 
     def _release_dataset(self, ):

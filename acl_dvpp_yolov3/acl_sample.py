@@ -99,18 +99,20 @@ class Sample(object):
         print("[Sample] width:{} height:{}".format(width, height))
         print("[Sample] image:{}".format(img_path))
         img_device, img_buffer_size = self._transfer_to_devicce(img_path, img_dict["dtype"])
-        print("[Sample] img_buffer_size:{}".format(img_buffer_size))
+
         # decode and resize
         dvpp_output_buffer, dvpp_output_size = \
             self.dvpp_process.run(img_device,
                                   img_buffer_size,
                                   width,
                                   height)
-
+        print("dvpp_output_buffer", dvpp_output_buffer)
         print("dvpp_output_size", dvpp_output_size)
         output_data = self.model_process.run(
             dvpp_output_buffer,
             dvpp_output_size)
+        
+        acl.media.dvpp_free(img_device)
         
         return output_data
         print("output_data type", type(output_data))
