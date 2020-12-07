@@ -151,4 +151,6 @@ class Dvpp():
         if self._decode_output_desc_:
             acl.media.dvpp_destroy_pic_desc(self._decode_output_desc_)
         self._resize_process(img_width, img_height)
+        acl.media.dvpp_free(self._decode_out_dev_buffer)
+        self._decode_out_dev_buffer = self._decode_out_buffer = None
         return self._resize_out_dev, self._resize_out_size
