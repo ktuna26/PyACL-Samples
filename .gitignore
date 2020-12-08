@@ -4,3 +4,4 @@ kernel_meta
 *.bin
 .ipynb_checkpoints
 build
+*.jpg

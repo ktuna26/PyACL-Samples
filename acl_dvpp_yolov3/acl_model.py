@@ -67,6 +67,8 @@ class Model(object):
             print("input ", i)
             print("model input dims", acl.mdl.get_input_dims(self.model_desc, i))
             print("model input datatype", acl.mdl.get_input_data_type(self.model_desc, i))
+            print("model input size", acl.mdl.get_input_size_by_index(self.model_desc, i))
+            print("model input format", acl.mdl.get_input_format(self.model_desc, i))
         
         self._gen_output_dataset(output_size)
         print("[Model] class Model init resource stage success")
@@ -120,7 +122,7 @@ class Model(object):
         img_info, ret = acl.rt.malloc(4 * 4, ACL_MEM_MALLOC_NORMAL_ONLY)
         check_ret("acl.rt.malloc", ret)
         ret = acl.rt.memcpy(img_info, 16, \
-                      acl.util.numpy_to_ptr(np.array([416, 416, 576, 768], dtype=np.float32)), \
+                      acl.util.numpy_to_ptr(np.array([416, 416, 1080, 1920], dtype=np.float32)), \
                       16, \
                       ACL_MEMCPY_HOST_TO_DEVICE)
         check_ret("acl.rt.memcpy", ret)
