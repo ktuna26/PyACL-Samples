@@ -5,3 +5,5 @@ kernel_meta
 .ipynb_checkpoints
 build
 *.jpg
+*.h264
+*.h265

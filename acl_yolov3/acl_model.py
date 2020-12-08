@@ -11,26 +11,30 @@ from constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
     ACL_MEMCPY_HOST_TO_DEVICE, ACL_MEMCPY_DEVICE_TO_HOST, \
     ACL_ERROR_NONE, NPY_BYTE
 from acl_util import check_ret
+import cv2
 
 class Model(object):
     def __init__(self,
-                 context,
-                 stream,
+                 device_id,
                  model_path,
-                 ):
+                 model_input_width,
+                 model_input_height):
+        self.device_id = device_id
         self.model_path = model_path    # string
         self.model_id = None            # pointer
         self.context = None             # pointer
-        self.context = context  # pointer
-        self.stream = stream
+        self.stream = None
         self.input_data = None
         self.output_data = None
         self.model_desc = None          # pointer when using
         self.input0_dataset_buffer = None
         self.input1_dataset_buffer = None
         self.input1_buffer = None
-
+        self.model_input_width = model_input_width
+        self.model_input_height = model_input_height
+        self.input_dataset = None
         self.init_resource()
+        
 
     def __del__(self):
         self._release_dataset()
@@ -47,8 +51,30 @@ class Model(object):
             check_ret("acl.rt.free", ret)
 
         print("[Model] class Model release source success")
+        
+        if self.stream:
+            acl.rt.destroy_stream(self.stream)
+
+        if self.context:
+            acl.rt.destroy_context(self.context)
+        acl.rt.reset_device(self.device_id)
+        acl.finalize()
+        
+        print("[ACL] class Sample release source success")
 
     def init_resource(self):
+        print("[ACL] init resource stage:")
+        acl.init()
+        ret = acl.rt.set_device(self.device_id)
+        check_ret("acl.rt.set_device", ret)
+
+        self.context, ret = acl.rt.create_context(self.device_id)
+        check_ret("acl.rt.create_context", ret)
+
+        self.stream, ret = acl.rt.create_stream()
+        check_ret("acl.rt.create_stream", ret)
+        print("[ACL] init resource stage success")
+        
         print("[Model] class Model init resource stage:")
         # context
         acl.rt.set_context(self.context)
@@ -56,7 +82,6 @@ class Model(object):
         self.model_id, ret = acl.mdl.load_from_file(self.model_path)
         check_ret("acl.mdl.load_from_file", ret)
         self.model_desc = acl.mdl.create_desc()
-        print("结构",self.model_desc)
         ret = acl.mdl.get_desc(self.model_desc, self.model_id)
         check_ret("acl.mdl.get_desc", ret)
         
@@ -75,32 +100,56 @@ class Model(object):
         output_size = acl.mdl.get_num_outputs(self.model_desc)
         self._gen_output_dataset(output_size)
         print("[Model] class Model init resource stage success")
+        
+    def resize_image(self, img, size):
 
-    def _gen_output_dataset(self, size):
-        print("[Model] create model output dataset:")
-        dataset = acl.mdl.create_dataset()
-        for i in range(size):
-            temp_buffer_size = acl.mdl.\
-                get_output_size_by_index(self.model_desc, i)
-            temp_buffer, ret = acl.rt.malloc(temp_buffer_size,
-                                             ACL_MEM_MALLOC_NORMAL_ONLY)
-            check_ret("acl.rt.malloc", ret)
-            dataset_buffer = acl.create_data_buffer(
-                temp_buffer,
-                temp_buffer_size)
+        h, w = img.shape[:2]
+        c = img.shape[2] if len(img.shape)>2 else 1
 
-            _, ret = acl.mdl.add_dataset_buffer(dataset, dataset_buffer)
-            if ret:
-                acl.destroy_data_buffer(dataset)
-                check_ret("acl.destroy_data_buffer", ret)
-        self.output_data = dataset
-        print("[Model] create model output dataset success")
+        if h == w: 
+            return cv2.resize(img, size, cv2.INTER_AREA)
 
-    def run(self, dvpp_output_buffer, dvpp_output_size, image_height=None, image_width=None):
-        self._gen_input_dataset(dvpp_output_buffer, dvpp_output_size, image_height, image_width)
+        dif = h if h > w else w
+
+        interpolation = cv2.INTER_AREA if dif > (size[0]+size[1])//2 else \
+                        cv2.INTER_CUBIC
+
+        x_pos = (dif - w)//2
+        y_pos = (dif - h)//2
+
+        if len(img.shape) == 2:
+            mask = np.zeros((dif, dif), dtype=img.dtype)
+            mask[y_pos:y_pos+h, x_pos:x_pos+w] = img[:h, :w]
+        else:
+            mask = np.zeros((dif, dif, c), dtype=img.dtype)
+            mask[y_pos:y_pos+h, x_pos:x_pos+w, :] = img[:h, :w, :]
+
+        return cv2.resize(mask, size, interpolation)
+   
+    def transfer_img_to_device(self, img):
+        image_height, image_width = img.shape[:2]
+        img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))
+        img_yuv = cv2.cvtColor(img_resized, cv2.COLOR_BGR2YUV_I420)
+        
+        img_host_ptr = acl.util.numpy_to_ptr(img_yuv)
+        
+        img_buf_size = img_yuv.itemsize * img_yuv.size
+        img_dev_ptr, ret = acl.rt.malloc(img_buf_size, ACL_MEM_MALLOC_NORMAL_ONLY )
+        check_ret("acl.rt.malloc", ret)
+        ret = acl.rt.memcpy(img_dev_ptr, img_buf_size, img_host_ptr, img_buf_size, ACL_MEMCPY_HOST_TO_DEVICE)
+        check_ret("acl.rt.memcpy", ret)
+        
+        return img_dev_ptr, img_buf_size, image_height, image_width
+    
+    def run(self, img):
+        img_dev_ptr, img_buf_size, image_height, image_width = self.transfer_img_to_device(img)
+        print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
+        self._gen_input_dataset(img_dev_ptr, img_buf_size, image_height, image_width)
         self.forward()
-        self._print_result(self.output_data)
-        return self.output_data
+        boxes = self.post_processing(self.output_data)
+        ret= acl.rt.free(img_dev_ptr)
+        check_ret("acl.rt.free", ret)
+        return boxes
 
     def forward(self):
         print('[Model] execute stage:')
@@ -135,7 +184,7 @@ class Model(object):
             check_ret("acl.destroy_data_buffer", ret)
 
         if image_height != None and image_width != None:
-            input2 = np.array([416, 416, image_height, image_width], dtype=np.float32)
+            input2 = np.array([self.model_input_width, self.model_input_height, image_height, image_width], dtype=np.float32)
             print("input2 {0}, size:{1}".format(input2, input2.size))
             input2_ptr = acl.util.numpy_to_ptr(input2)
             acl.rt.memcpy(self.input1_buffer, input2.size * input2.itemsize, input2_ptr,
@@ -152,6 +201,26 @@ class Model(object):
                 check_ret("acl.destroy1_data_buffer", ret)
         print("[Model] create model input dataset success")
 
+    def _gen_output_dataset(self, size):
+        print("[Model] create model output dataset:")
+        dataset = acl.mdl.create_dataset()
+        for i in range(size):
+            temp_buffer_size = acl.mdl.\
+                get_output_size_by_index(self.model_desc, i)
+            temp_buffer, ret = acl.rt.malloc(temp_buffer_size,
+                                             ACL_MEM_MALLOC_NORMAL_ONLY)
+            check_ret("acl.rt.malloc", ret)
+            dataset_buffer = acl.create_data_buffer(
+                temp_buffer,
+                temp_buffer_size)
+
+            _, ret = acl.mdl.add_dataset_buffer(dataset, dataset_buffer)
+            if ret:
+                acl.destroy_data_buffer(dataset)
+                check_ret("acl.destroy_data_buffer", ret)
+        self.output_data = dataset
+        print("[Model] create model output dataset success")
+        
     def _release_dataset(self, ):
         for dataset in [self.input_dataset, self.output_data]:
             if not dataset:
@@ -166,7 +235,7 @@ class Model(object):
             ret = acl.mdl.destroy_dataset(dataset)
             check_ret("acl.mdl.destroy_dataset", ret)
 
-    def _print_result(self, infer_output):
+    def post_processing(self, infer_output):
         dataset = {}
         res_num = 0
         num = acl.mdl.get_dataset_num_buffers(infer_output)
@@ -186,7 +255,7 @@ class Model(object):
                                            (infer_output_size//4,),# 因为要解析为int类型的数据，所以这里的size=byte_num/4
                                            6)# int32
                 res_num = int(result[0])
-                print("result ouput",res_num)
+#                 print("result ouput",res_num)
                 dataset['num_detections'] = res_num
             elif i == 0:
                 result = acl.util.ptr_to_numpy(output_host,
@@ -200,18 +269,18 @@ class Model(object):
                     object['y2'] = result[3 * res_num + j]
                     object['detection_scores']  = float(result[4 * res_num + j])
                     object['detection_classes'] = result[5 * res_num + j]
-                    print(object)
+#                     print(object)
                     dataset[j] = object
-                print("result",result)
+#                 print("result",result)
            
             # free the host buffer
-            ret= acl.rt.free_host(output_host)
-
+            ret = acl.rt.free_host(output_host)
+        return dataset
         # 对推理结果进行打印
-        print('[RESULT] ','num_detections: ', res_num)
-        for i in range(res_num):
-            print('[RESULT] ','result: ', i + 1)
-            print('[RESULT] ','detection_classes: ', dataset[i]['detection_classes'])
-            print('[RESULT] ','detection_scores: ', dataset[i]['detection_scores'])
-            print('[RESULT] ','detection_boxes: ', dataset[i]['x1'], dataset[i]['y1'], dataset[i]['x2'], dataset[i]['y2'])
-            print("dataset",dataset)
+#         print('[RESULT] ','num_detections: ', res_num)
+#         for i in range(res_num):
+#             print('[RESULT] ','result: ', i + 1)
+#             print('[RESULT] ','detection_classes: ', dataset[i]['detection_classes'])
+#             print('[RESULT] ','detection_scores: ', dataset[i]['detection_scores'])
+#             print('[RESULT] ','detection_boxes: ', dataset[i]['x1'], dataset[i]['y1'], dataset[i]['x2'], dataset[i]['y2'])
+#             print("dataset",dataset)
