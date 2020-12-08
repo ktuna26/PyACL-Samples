@@ -86,9 +86,7 @@ class Model(object):
         check_ret("acl.mdl.get_desc", ret)
         
         input_size = acl.mdl.get_num_inputs(self.model_desc)
-        print("input number:%d" % input_size)
         input1_size = acl.mdl.get_input_size_by_index(self.model_desc, 1)
-        print("input %d: %d" % (1, input1_size))
         
         self.input1_buffer, ret = acl.rt.malloc(input1_size,
                                             ACL_MEM_MALLOC_NORMAL_ONLY)
@@ -99,6 +97,18 @@ class Model(object):
         
         output_size = acl.mdl.get_num_outputs(self.model_desc)
         self._gen_output_dataset(output_size)
+        print("model input size", input_size)
+        for i in range(input_size):
+            print("input ", i)
+            print("model input dims", acl.mdl.get_input_dims(self.model_desc, i))
+            print("model input datatype", acl.mdl.get_input_data_type(self.model_desc, i))
+        print("=" * 50)
+        print("model output size", output_size)
+        for i in range(output_size):
+            print("output ", i)
+            print("model output dims", acl.mdl.get_output_dims(self.model_desc, i))
+            print("model output datatype", acl.mdl.get_output_data_type(self.model_desc, i))
+        print("=" * 50)
         print("[Model] class Model init resource stage success")
         
     def resize_image(self, img, size):
@@ -143,7 +153,7 @@ class Model(object):
     
     def run(self, img):
         img_dev_ptr, img_buf_size, image_height, image_width = self.transfer_img_to_device(img)
-        print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
+#         print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
         self._gen_input_dataset(img_dev_ptr, img_buf_size, image_height, image_width)
         self.forward()
         boxes = self.post_processing(self.output_data)
@@ -185,19 +195,19 @@ class Model(object):
 
         if image_height != None and image_width != None:
             input2 = np.array([self.model_input_width, self.model_input_height, image_height, image_width], dtype=np.float32)
-            print("input2 {0}, size:{1}".format(input2, input2.size))
+#             print("input2 {0}, size:{1}".format(input2, input2.size))
             input2_ptr = acl.util.numpy_to_ptr(input2)
             acl.rt.memcpy(self.input1_buffer, input2.size * input2.itemsize, input2_ptr,
                             input2.size * input2.itemsize, ACL_MEMCPY_HOST_TO_DEVICE)
 
-            # Don't need to create the input1_dataset_buffer, because in init_resource(), create the self.input1_dataset_buffer with self.input1_buffer
+            # Don't need to create the input1_dataset_buffer, because in init_resource(), created the self.input1_dataset_buffer with self.input1_buffer
             _, ret = acl.mdl.add_dataset_buffer(
                 self.input_dataset,
                 self.input1_dataset_buffer)
             check_ret("acl.add_dataset_buffer", ret)
             if ret:
                 ret = acl.destroy_data_buffer(self.input1_dataset_buffer)
-                self.input1_dataset_buffer = None    //判断是否清空了buffer
+                self.input1_dataset_buffer = None
                 check_ret("acl.destroy1_data_buffer", ret)
         print("[Model] create model input dataset success")
 
