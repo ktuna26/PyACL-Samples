@@ -142,9 +142,9 @@ class Model(object):
         img_yuv = cv2.cvtColor(img_resized, cv2.COLOR_BGR2YUV_I420)
         
         img_host_ptr = acl.util.numpy_to_ptr(img_yuv)
-        
         img_buf_size = img_yuv.itemsize * img_yuv.size
-        img_dev_ptr, ret = acl.rt.malloc(img_buf_size, ACL_MEM_MALLOC_NORMAL_ONLY )
+        print("img_buf_size", img_buf_size)
+        img_dev_ptr, ret = acl.rt.malloc(img_buf_size, ACL_MEM_MALLOC_NORMAL_ONLY)
         check_ret("acl.rt.malloc", ret)
         ret = acl.rt.memcpy(img_dev_ptr, img_buf_size, img_host_ptr, img_buf_size, ACL_MEMCPY_HOST_TO_DEVICE)
         check_ret("acl.rt.memcpy", ret)

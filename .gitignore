@@ -7,3 +7,4 @@ build
 *.jpg
 *.h264
 *.h265
+*.caffemodel
