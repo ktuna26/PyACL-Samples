@@ -24,14 +24,3 @@ atc --model=./yolov3.prototxt \
     --soc_version=Ascend310 \
     --insert_op_conf=./aipp_yolov3.cfg
 ```
-
-## Model replacement
-
-Replace the YoloV3 model with other input specifications, we need to modify the configuration as follow:
-
-### Configure setup.config
-./data/config/setup.config
-```bash
-model_width = xxx
-model_height = xxx
-```
