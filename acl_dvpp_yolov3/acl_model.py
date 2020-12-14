@@ -135,7 +135,7 @@ class Model(object):
             check_ret("acl.destroy_data_buffer", ret)
 
         if image_height != None and image_width != None:
-            input2 = np.array([416, 416, image_height, image_width], dtype=np.float32)
+            input2 = np.array([608, 608, image_height, image_width], dtype=np.float32)
             print("input2 {0}, size:{1}".format(input2, input2.size))
             input2_ptr = acl.util.numpy_to_ptr(input2)
             acl.rt.memcpy(self.input1_buffer, input2.size * input2.itemsize, input2_ptr,

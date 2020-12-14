@@ -129,20 +129,23 @@ class Model(object):
 
         if len(img.shape) == 2:
             mask = np.zeros((dif, dif), dtype=img.dtype)
+            mask.fill(128)
             mask[y_pos:y_pos+h, x_pos:x_pos+w] = img[:h, :w]
         else:
             mask = np.zeros((dif, dif, c), dtype=img.dtype)
+            mask.fill(128)
             mask[y_pos:y_pos+h, x_pos:x_pos+w, :] = img[:h, :w, :]
 
         return cv2.resize(mask, size, interpolation)
    
     def transfer_img_to_device(self, img):
-        image_height, image_width = img.shape[:2]
-        img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))
-        img_yuv = cv2.cvtColor(img_resized, cv2.COLOR_BGR2YUV_I420)
         
-        img_host_ptr = acl.util.numpy_to_ptr(img_yuv)
-        img_buf_size = img_yuv.itemsize * img_yuv.size
+        image_height, image_width = img.shape[:2]
+        # BGR to RGB
+        img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1]
+        img_host_ptr = acl.util.numpy_to_ptr(img_resized)
+        print(img_host_ptr)
+        img_buf_size = img_resized.itemsize * img_resized.size
         print("img_buf_size", img_buf_size)
         img_dev_ptr, ret = acl.rt.malloc(img_buf_size, ACL_MEM_MALLOC_NORMAL_ONLY)
         check_ret("acl.rt.malloc", ret)
