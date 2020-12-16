@@ -38,7 +38,7 @@ class Sample(object):
 
         self.model_process = Model(self.context,
                                    self.stream,
-                                   model_path)
+                                   model_path, self._model_input_width, self._model_input_height)
 
         self.dvpp_process = Dvpp(self.stream,
                                  model_input_width,
@@ -112,7 +112,7 @@ class Sample(object):
                                   img_buffer_size,
                                   width,
                                   height)
-        output_data = self.model_process.run(
+        boxes = self.model_process.run(
             dvpp_output_buffer,
             dvpp_output_size,
             height,
@@ -124,7 +124,7 @@ class Sample(object):
 
         self.dvpp_process.release_buffer()
         
-        return output_data
+        return boxes
 
 
 if __name__ == '__main__':
