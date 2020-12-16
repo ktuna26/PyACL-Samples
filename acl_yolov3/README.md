@@ -20,7 +20,7 @@ cd ./model
 atc --model=./yolov3.prototxt \
     --weight=./yolov3.caffemodel \
     --framework=0 \
-    --output=./yolov3_caffe \
+    --output=./yolov3_caffe_416_no_csc \
     --soc_version=Ascend310 \
-    --insert_op_conf=./aipp_yolov3.cfg
+    --insert_op_conf=./aipp_yolov3_416_no_csc.cfg
 ```
