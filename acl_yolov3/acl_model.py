@@ -138,11 +138,9 @@ class Model(object):
 
         return cv2.resize(mask, size, interpolation)
    
-    def transfer_img_to_device(self, img):
+    def transfer_img_to_device(self, img_resized):
         
-        image_height, image_width = img.shape[:2]
         # BGR to RGB
-        img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1]
         img_host_ptr = acl.util.numpy_to_ptr(img_resized)
         print(img_host_ptr)
         img_buf_size = img_resized.itemsize * img_resized.size
@@ -152,10 +150,12 @@ class Model(object):
         ret = acl.rt.memcpy(img_dev_ptr, img_buf_size, img_host_ptr, img_buf_size, ACL_MEMCPY_HOST_TO_DEVICE)
         check_ret("acl.rt.memcpy", ret)
         
-        return img_dev_ptr, img_buf_size, image_height, image_width
+        return img_dev_ptr, img_buf_size
     
     def run(self, img):
-        img_dev_ptr, img_buf_size, image_height, image_width = self.transfer_img_to_device(img)
+        image_height, image_width = img.shape[:2]
+        img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1]
+        img_dev_ptr, img_buf_size = self.transfer_img_to_device(img_resized)
 #         print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
         self._gen_input_dataset(img_dev_ptr, img_buf_size, image_height, image_width)
         self.forward()
