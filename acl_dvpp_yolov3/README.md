@@ -1,4 +1,5 @@
-# Object Detection Model
+# YoloV3 Object Detection
+Please open the jupyter notebook for a quick demo.
 
 ## Original Network Link
 
