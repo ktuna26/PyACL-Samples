@@ -10,3 +10,4 @@ build
 *.caffemodel
 *.so
 *.o
+*.pb
