@@ -262,17 +262,16 @@ class Model(object):
             acl.rt.memcpy(output_host, infer_output_size, infer_output_ptr,
                           infer_output_size, ACL_MEMCPY_DEVICE_TO_HOST)
 
-            # 对输出进行处理，将2种类别的输出分别分开
             if i == 1:
                 result = acl.util.ptr_to_numpy(output_host,
-                                           (infer_output_size//4,),# 因为要解析为int类型的数据，所以这里的size=byte_num/4
+                                           (infer_output_size//4,),
                                            6)# int32
                 res_num = int(result[0])
 #                 print("result ouput",res_num)
                 dataset['num_detections'] = res_num
             elif i == 0:
                 result = acl.util.ptr_to_numpy(output_host,
-                                           (infer_output_size//4,),# 因为要解析为float32类型的数据，所以这里的size=byte_num/4
+                                           (infer_output_size//4,),
                                            11)# float32
                 for j in range(res_num):
                     object = {}
@@ -289,7 +288,6 @@ class Model(object):
             # free the host buffer
             ret = acl.rt.free_host(output_host)
         return dataset
-        # 对推理结果进行打印
 #         print('[RESULT] ','num_detections: ', res_num)
 #         for i in range(res_num):
 #             print('[RESULT] ','result: ', i + 1)
