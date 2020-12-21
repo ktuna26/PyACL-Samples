@@ -10,8 +10,8 @@ https://github.com/ChenYingpeng/caffe-yolov3
 
 https://obs-model-ascend.obs.cn-east-2.myhuaweicloud.com/yolov3/yolov3.caffemodel
 
-Download the model weight file ``yolov3.caffemodel`` from this link or simply wget to ./model dir. 
-Note that if you are developing applications for Atlas 500, you will need to make the model conversion on an development environment.
+Download the model weight file ``yolov3.caffemodel`` from this link or simply `wget` to ./model dir. 
+Note that if you are developing applications for Atlas 500, you will need to make the model conversion in a separate development environment.
 
 ## Convert model To Ascend om file
 
