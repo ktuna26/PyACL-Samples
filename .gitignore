@@ -8,3 +8,5 @@ build
 *.h264
 *.h265
 *.caffemodel
+*.so
+*.o
