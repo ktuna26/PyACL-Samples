@@ -9,12 +9,13 @@ https://github.com/YunYang1994/tensorflow-yolov3
 
 Download the frozen PB file of tensorflow yolov3 from this link,
 - https://www.huaweicloud.com/intl/en-us/ascend/resources/modelzoo/Models/5c3ec43f66ba455a9992fff905c6d687
+- Upload the pb file to `model` directory
 
 ## Convert model To Ascend om file
 
 ```bash
 cd ./model
-atc --model=yolov3_coco_tf.pb \
+atc --model=yolov3_tf.pb \
     --framework=3 \
     --input_shape="input/input_data:1,416,416,3" \
     --output=./yolov3_coco_tf_rgb888 \
