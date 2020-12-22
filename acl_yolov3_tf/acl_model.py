@@ -12,6 +12,7 @@ from constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
     ACL_ERROR_NONE, NPY_BYTE
 from acl_util import check_ret
 import cv2
+from postprocessing import postprocess_boxes, nms, get_model_output_by_index
 
 class Model(object):
     def __init__(self,
@@ -142,19 +143,31 @@ class Model(object):
         check_ret("acl.rt.memcpy", ret)
         
         return img_dev_ptr, img_buf_size
-    
+
     def run(self, img):
-        image_height, image_width = img.shape[:2]
+        
         img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1] 
         img_dev_ptr, img_buf_size = self.transfer_img_to_device(img_resized)
 #         print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
-        self._gen_input_dataset(img_dev_ptr, img_buf_size, image_height, image_width)
+        self._gen_input_dataset(img_dev_ptr, img_buf_size)
         self.forward()
-        return self.output_data
-        boxes = self.post_processing(self.output_data)
-        ret= acl.rt.free(img_dev_ptr)
+        
+        ret = acl.rt.free(img_dev_ptr)
         check_ret("acl.rt.free", ret)
-        return boxes
+        
+        pred_sbbox = get_model_output_by_index(self.output_data, 0)
+        pred_mbbox = get_model_output_by_index(self.output_data, 1)
+        pred_lbbox = get_model_output_by_index(self.output_data, 2)
+        
+        pred_bbox = np.concatenate([pred_sbbox, \
+                                    pred_mbbox, \
+                                    pred_lbbox], axis=0)
+        
+        original_image_size = img.shape[:2]
+        bboxes = postprocess_boxes(pred_bbox, original_image_size, self.model_input_width, 0.3)
+        bboxes = nms(bboxes, 0.45, method='nms')
+        
+        return bboxes
 
     def forward(self):
         print('[Model] execute stage:')
@@ -223,51 +236,3 @@ class Model(object):
 
             ret = acl.mdl.destroy_dataset(dataset)
             check_ret("acl.mdl.destroy_dataset", ret)
-
-    def post_processing(self, infer_output):
-        dataset = {}
-        res_num = 0
-        num = acl.mdl.get_dataset_num_buffers(infer_output)
-        for i in [1, 0]:
-            temp_output_buf = acl.mdl.get_dataset_buffer(infer_output, i)
-
-            infer_output_ptr = acl.get_data_buffer_addr(temp_output_buf)
-            infer_output_size = acl.get_data_buffer_size(temp_output_buf)
-
-            output_host, _ = acl.rt.malloc_host(infer_output_size)
-            acl.rt.memcpy(output_host, infer_output_size, infer_output_ptr,
-                          infer_output_size, ACL_MEMCPY_DEVICE_TO_HOST)
-
-            if i == 1:
-                result = acl.util.ptr_to_numpy(output_host,
-                                           (infer_output_size//4,),
-                                           6)# int32
-                res_num = int(result[0])
-#                 print("result ouput",res_num)
-                dataset['num_detections'] = res_num
-            elif i == 0:
-                result = acl.util.ptr_to_numpy(output_host,
-                                           (infer_output_size//4,),
-                                           11)# float32
-                for j in range(res_num):
-                    object = {}
-                    object['x1'] = result[0 * res_num + j]
-                    object['y1'] = result[1 * res_num + j]
-                    object['x2'] = result[2 * res_num + j]
-                    object['y2'] = result[3 * res_num + j]
-                    object['detection_scores']  = float(result[4 * res_num + j])
-                    object['detection_classes'] = result[5 * res_num + j]
-#                     print(object)
-                    dataset[j] = object
-#                 print("result",result)
-           
-            # free the host buffer
-            ret = acl.rt.free_host(output_host)
-        return dataset
-#         print('[RESULT] ','num_detections: ', res_num)
-#         for i in range(res_num):
-#             print('[RESULT] ','result: ', i + 1)
-#             print('[RESULT] ','detection_classes: ', dataset[i]['detection_classes'])
-#             print('[RESULT] ','detection_scores: ', dataset[i]['detection_scores'])
-#             print('[RESULT] ','detection_boxes: ', dataset[i]['x1'], dataset[i]['y1'], dataset[i]['x2'], dataset[i]['y2'])
-#             print("dataset",dataset)
