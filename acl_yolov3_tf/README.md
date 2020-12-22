@@ -7,7 +7,8 @@ https://github.com/YunYang1994/tensorflow-yolov3
 
 ## Pre-trained Model Link:
 
-Coming soon.
+Download the frozen PB file of tensorflow yolov3 from this link,
+- https://www.huaweicloud.com/intl/en-us/ascend/resources/modelzoo/Models/5c3ec43f66ba455a9992fff905c6d687
 
 ## Convert model To Ascend om file
 
