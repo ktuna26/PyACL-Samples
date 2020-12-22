@@ -7,9 +7,7 @@ https://github.com/YunYang1994/tensorflow-yolov3
 
 ## Pre-trained Model Link:
 
-### Caffe
-
-Comming soon.
+Coming soon.
 
 ## Convert model To Ascend om file
 
