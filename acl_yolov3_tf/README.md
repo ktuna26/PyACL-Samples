@@ -1,28 +1,25 @@
-# YoloV3 Object Detection
+# Tensorflow YoloV3 Object Detection
 Please open the jupyter notebook for a quick demo.
 
 ## Original Network Link
 
-https://github.com/ChenYingpeng/caffe-yolov3
+https://github.com/YunYang1994/tensorflow-yolov3
 
 ## Pre-trained Model Link:
 
 ### Caffe
 
-https://obs-model-ascend.obs.cn-east-2.myhuaweicloud.com/yolov3/yolov3.caffemodel
-
-Download the model weight file ``yolov3.caffemodel`` from this link or simply `wget` to ./model dir. 
-Note that if you are developing applications for Atlas 500, you will need to make the model conversion in a separate development environment.
+Comming soon.
 
 ## Convert model To Ascend om file
 
-### Caffe
 ```bash
 cd ./model
-atc --model=./yolov3.prototxt \
-    --weight=./yolov3.caffemodel \
-    --framework=0 \
-    --output=./yolov3_caffe_416_no_csc \
+atc --model=yolov3_coco_tf.pb \
+    --framework=3 \
+    --input_shape="input/input_data:1,416,416,3" \
+    --output=./yolov3_coco_tf_rgb888 \
+    --insert_op_conf=./aipp_yolov3_tf.cfg \
     --soc_version=Ascend310 \
-    --insert_op_conf=./aipp_yolov3_416_no_csc.cfg
+    --out_nodes="pred_sbbox/concat_2:0;pred_mbbox/concat_2:0;pred_lbbox/concat_2:0"
 ```
