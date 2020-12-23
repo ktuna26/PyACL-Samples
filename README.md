@@ -1,4 +1,6 @@
 # Python Ascend Computing Language (ACL) Samples
+ ## _N.B. Please convert the models based on the README of each sample!_ 
+
 #### Installation of pyACL
 https://support.huaweicloud.com/intl/en-us/asdevg-python-cann/atlaspython_01_0006.html
 #### ACL Overview
