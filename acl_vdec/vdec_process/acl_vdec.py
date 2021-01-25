@@ -12,7 +12,7 @@ import cv2
 import time
 
 class Vdec():
-    def __init__(self, device_id, input_width, input_height):
+    def __init__(self, input_width, input_height, device_id=0):
         self.device_id = device_id
         
         ret = acl.rt.set_device(self.device_id)
@@ -23,8 +23,6 @@ class Vdec():
         # check_ret("acl.rt.create_stream", ret)
         
         self.vdec_channel_desc = None
-        self.input_width = input_width
-        self.input_height = input_height
         self._vdec_exit = True
         self._en_type = H264_MAIN_LEVEL
         self._format = PIXEL_FORMAT_YVU_SEMIPLANAR_420
@@ -33,9 +31,19 @@ class Vdec():
         self.cb_thread_id = None
         self.images_buffer = []
         self.frame_config = acl.media.vdec_create_frame_config()
-        
+        self.input_width = input_width
+        self.input_height = input_height
         self.decoded_img_buf_size = self.input_width * self.input_height * 3 // 2
-            
+        # 此处设置触发回调处理之前的等待时间，
+        # 由acl.rt.subscribe_report接口指定的线程处理回调。
+        timeout = 100
+        self.cb_thread_id, ret = acl.util.start_thread(
+            self._thread_func, [timeout])
+        # print("self.cb_thread_id", self.cb_thread_id)
+        check_ret("acl.util.start_thread", ret)
+
+        self.init_resource()
+        
     def __del__(self):
         print('[VDEC] release source stage:')
 
@@ -161,24 +169,18 @@ class Vdec():
         acl.media.dvpp_set_pic_desc_format(self.dvpp_pic_desc,
                                            self._format)
         # print("[Vdec] create output pic desc success")
-        time.sleep(0.001)
+        time.sleep(0.01)
         return
 
-    def run(self, video_info):
-        self.video_path, self.input_width, self.input_height, self.dtype = video_info
+    def run(self, video_path):
+        self.video_path = video_path        
         self.images_buffer = []
-        # 此处设置触发回调处理之前的等待时间，
-        # 由acl.rt.subscribe_report接口指定的线程处理回调。
-        timeout = 100
-        self.cb_thread_id, ret = acl.util.start_thread(
-            self._thread_func, [timeout])
-        print("self.cb_thread_id", self.cb_thread_id)
-        check_ret("acl.util.start_thread", ret)
+
         
         # ret = acl.rt.subscribe_report(self.cb_thread_id, self.stream)
         # check_ret("acl.rt.subscribe_report", ret)
         
-        self.init_resource()
+        
         cap = cv2.VideoCapture(self.video_path)
         cap.set(cv2.CAP_PROP_FORMAT, -1)
         self.read_frame_cnt = 0
@@ -211,9 +213,10 @@ class Vdec():
             else:
                 break
         
+        print("All frames sent", time.time())
         # self._vdec_exit = False
         # ret = acl.util.stop_thread(self.cb_thread_id)
         # check_ret("acl.util.stop_thread", ret)
         
-        self.destroy_resource()
-        print("[Vdec] vdec finish!!!\n")
+        # self.destroy_resource()
+        print("[Vdec] vdec finish!!!", time.time())
