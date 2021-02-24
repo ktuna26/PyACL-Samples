@@ -1,25 +1,36 @@
-# Tensorflow YoloV3 Object Detection
-Please open the jupyter notebook for a quick demo.
+# PyTorch YoloV5 Object Detection
+Please open the jupyter notebook for a quick demo. This sample uses  **yolov5s**. 
 
 ## Original Network Link
 
-https://github.com/YunYang1994/tensorflow-yolov3
+https://github.com/ultralytics/yolov5
 
 ## Pre-trained Model Link:
 
-Download the frozen PB file of tensorflow yolov3 from this link,
-- https://www.huaweicloud.com/intl/en-us/ascend/resources/modelzoo/Models/5c3ec43f66ba455a9992fff905c6d687
-- Upload the pb file to `model` directory
+Download the PT file of from this link,
+- https://github.com/ultralytics/yolov5/releases/tag/v4.0
+- Upload the pt file to `model` directory
 
-## Convert model To Ascend om file
+## PT model -> ONNX format -> Ascend om format
+### PT -> ONNX
+Use the models/export.py script in the original repository to convert PT file to ONNX file. Note that CANN 20.2 support ONNX operators version 11.
+```
+torch.onnx.export(model, img, f, verbose=True,  opset_version=11, input_names=['images'],
+```
+instead of 
+```
+torch.onnx.export(model, img, f, verbose=True,  opset_version=12, input_names=['images'],
+```
+### Remove a few operators in the ONNX file
+The  **Slice** and  **Transpose** operators will slow down the model inference significantly. Use ./model/modify_yolov5.py script in this repo to remove the impact of these operators.
 
+### ONNX -> OM
 ```bash
 cd ./model
-atc --model=yolov3_tf.pb \
-    --framework=3 \
-    --input_shape="input/input_data:1,416,416,3" \
-    --output=./yolov3_coco_tf_rgb888 \
-    --insert_op_conf=./aipp_yolov3_tf.cfg \
+atc --model=modify_yolov5s.onnx \
+    --framework=5 \
+    --output=modify_yolov5s_out \
     --soc_version=Ascend310 \
-    --out_nodes="pred_sbbox/concat_2:0;pred_mbbox/concat_2:0;pred_lbbox/concat_2:0"
+    --input_shape="images:1,12,320,320" \
+    --out_nodes="Reshape_259:0;Reshape_275:0;Reshape_291:0"
 ```
