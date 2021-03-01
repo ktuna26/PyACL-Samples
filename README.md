@@ -2,10 +2,10 @@
  ## _N.B. Please convert the models based on the README of each sample!_ 
 
 #### Docker PyACL environment
-Feel free to `docker pull tianyuzhouhw/atlas_dev_env:amd64.v20.2`. This image integrates ACL libs 20.2, model conversion tool (ATC), jupyter notebook and a bunch of python dependencies
--  **On Atlas 500** : docker run -it --rm -p 8888:8888  --device=/dev/davinci0 --device=/dev/davinci_manager --device=/dev/hisi_hdc --device /dev/devmm_svm  -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi  -v /home/data/miniD/driver/lib64:/home/data/miniD/driver/lib64 tianyuzhouhw/atlas_dev_env:aarch64.v20.2
+Feel free to `docker pull tianyuzhouhw/atlas_dev_env:{amd64, aarch64}.v20.2`. This image integrates ACL libs 20.2, model conversion tool (ATC), jupyter notebook and a bunch of python dependencies
+-  **On Atlas 500** : `docker run -it --rm -p 8888:8888  --device=/dev/davinci0 --device=/dev/davinci_manager --device=/dev/hisi_hdc --device /dev/devmm_svm  -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi  -v /home/data/miniD/driver/lib64:/home/data/miniD/driver/lib64 tianyuzhouhw/atlas_dev_env:aarch64.v20.2`
 
--  **On a non-Atlas device** : docker run -it --rm tianyuzhouhw/atlas_dev_env:aarch64.v20.2 /bin/bash
+-  **On a non-Atlas device** : `docker run -it --rm tianyuzhouhw/atlas_dev_env:{aarch64, amd64}.v20.2 /bin/bash`. This gives a CLI for ATC and (cross-)compiling your C++ program
 
 #### Installation of pyACL
 https://support.huaweicloud.com/intl/en-us/asdevg-python-cann/atlaspython_01_0006.html
