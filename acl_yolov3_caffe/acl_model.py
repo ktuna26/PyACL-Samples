@@ -7,11 +7,12 @@ MODIFIED: 2020-6-28 14:04:45
 import acl
 import struct
 import numpy as np
-from constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
+from .constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
     ACL_MEMCPY_HOST_TO_DEVICE, ACL_MEMCPY_DEVICE_TO_HOST, \
     ACL_ERROR_NONE, NPY_BYTE
-from acl_util import check_ret
+from .acl_util import check_ret, letterbox_resize
 import cv2
+from time import time
 
 class Model(object):
     def __init__(self,
@@ -19,6 +20,8 @@ class Model(object):
                  model_path,
                  model_input_width,
                  model_input_height):
+        
+        t1 = time()
         self.device_id = device_id
         self.model_path = model_path    # string
         self.model_id = None            # pointer
@@ -33,6 +36,7 @@ class Model(object):
         self.model_input_width = model_input_width
         self.model_input_height = model_input_height
         self.input_dataset = None
+        print("part 1 takes ", time()-t1)
         self.init_resource()
         
 
@@ -64,27 +68,41 @@ class Model(object):
 
     def init_resource(self):
         print("[ACL] init resource stage:")
-        acl.init()
+#         acl.init()
+        t1 = time()
         ret = acl.rt.set_device(self.device_id)
         check_ret("acl.rt.set_device", ret)
-
-        self.context, ret = acl.rt.create_context(self.device_id)
-        check_ret("acl.rt.create_context", ret)
-
-        self.stream, ret = acl.rt.create_stream()
-        check_ret("acl.rt.create_stream", ret)
-        print("[ACL] init resource stage success")
+        print("part set_device takes ", time()-t1)
         
-        print("[Model] class Model init resource stage:")
-        # context
-        acl.rt.set_context(self.context)
+#         t1 = time()
+#         self.context, ret = acl.rt.create_context(self.device_id)
+#         check_ret("acl.rt.create_context", ret)
+#         print("part create_context takes ", time()-t1)
+        
+#         t1 = time()
+#         self.stream, ret = acl.rt.create_stream()
+#         check_ret("acl.rt.create_stream", ret)
+#         print("part create_stream takes ", time()-t1)
+#         print("[ACL] init resource stage success")
+        
+#         print("[Model] class Model init resource stage:")
+#         # context
+#         t1 = time()
+#         acl.rt.set_context(self.context)
+#         print("part set_context takes ", time()-t1)
         # load_model
+        t1 = time()
         self.model_id, ret = acl.mdl.load_from_file(self.model_path)
         check_ret("acl.mdl.load_from_file", ret)
+        print("part load_from_file takes ", time()-t1)
+        
+        t1 = time()
         self.model_desc = acl.mdl.create_desc()
         ret = acl.mdl.get_desc(self.model_desc, self.model_id)
         check_ret("acl.mdl.get_desc", ret)
+        print("part get_desc takes ", time()-t1)
         
+        t1 = time()
         input_size = acl.mdl.get_num_inputs(self.model_desc)
         input1_size = acl.mdl.get_input_size_by_index(self.model_desc, 1)
         
@@ -94,9 +112,13 @@ class Model(object):
         self.input1_dataset_buffer = acl.create_data_buffer(
             self.input1_buffer,
             input1_size)
+        print("part create_data_buffer takes ", time()-t1)
         
+        t1 = time()
         output_size = acl.mdl.get_num_outputs(self.model_desc)
         self._gen_output_dataset(output_size)
+        print("part _gen_output_dataset takes ", time()-t1)
+        
         print("model input size", input_size)
         for i in range(input_size):
             print("input ", i)
@@ -135,8 +157,8 @@ class Model(object):
             mask = np.zeros((dif, dif, c), dtype=img.dtype)
             mask.fill(128)
             mask[y_pos:y_pos+h, x_pos:x_pos+w, :] = img[:h, :w, :]
-
-        return cv2.resize(mask, size, interpolation)
+        print("Changed interpolation")
+        return cv2.resize(mask, size, cv2.INTER_NEAREST)
    
     def transfer_img_to_device(self, img_resized):
         
@@ -154,11 +176,17 @@ class Model(object):
     
     def run(self, img):
         image_height, image_width = img.shape[:2]
-        img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1]
+        img_resized = letterbox_resize(img, self.model_input_width, self.model_input_height)[:, :, ::-1]
+        # img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1]
+        # img_resized = (img_resized / 255).astype(np.float32).transpose([2, 0, 1])
+        img_resized = np.ascontiguousarray(img_resized)
+        print("img_resized shape", img_resized.shape)
         img_dev_ptr, img_buf_size = self.transfer_img_to_device(img_resized)
 #         print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
         self._gen_input_dataset(img_dev_ptr, img_buf_size, image_height, image_width)
         self.forward()
+        self.preprocessed_img = img_resized.copy()
+        # return
         boxes = self.post_processing(self.output_data)
         ret= acl.rt.free(img_dev_ptr)
         check_ret("acl.rt.free", ret)

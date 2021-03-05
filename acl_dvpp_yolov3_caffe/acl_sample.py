@@ -57,7 +57,7 @@ class Sample(object):
         if self.context:
             acl.rt.destroy_context(self.context)
         acl.rt.reset_device(self.device_id)
-        acl.finalize()
+        # acl.finalize()
         print("[Sample] class Sample release source success")
 
     def init_resource(self):
@@ -93,9 +93,11 @@ class Sample(object):
         check_ret("acl.rt.malloc_host", ret)
         ret = acl.rt.memcpy(host_buffer, dvpp_output_size,
                 dvpp_output_buffer, dvpp_output_size, ACL_MEMCPY_DEVICE_TO_HOST)
+        check_ret("acl.rt.memcpy", ret)
         output_pic_numpy = acl.util.ptr_to_numpy(host_buffer, (dvpp_output_size,), NPY_UBYTE)
-        output_pic_numpy.tofile("./res.yuv")
-        acl.rt.free_host(host_buffer)
+        # output_pic_numpy.tofile("./res.yuv")
+        # acl.rt.free_host(host_buffer)
+        return output_pic_numpy
 
     def forward(self, img_dict):
         img_path, image_dtype = img_dict["path"], img_dict["dtype"]
@@ -112,6 +114,7 @@ class Sample(object):
                                   img_buffer_size,
                                   width,
                                   height)
+        print("dvpp_output_size", dvpp_output_size)
         boxes = self.model_process.run(
             dvpp_output_buffer,
             dvpp_output_size,

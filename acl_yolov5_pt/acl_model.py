@@ -126,9 +126,9 @@ class Model(object):
         image_np /= 255.0
         image_np_expanded = np.expand_dims(image_np, axis=0)  # NCHW
         # Focus
-        image_np_expanded = focus_process(image_np_expanded)
-        print("image_np_expanded shape:", image_np_expanded.shape)
-        img_numpy = np.ascontiguousarray(image_np_expanded)
+        img_numpy = focus_process(image_np_expanded)
+        print("image_np_expanded shape:", img_numpy.shape)
+        img_numpy = np.ascontiguousarray(img_numpy)
         print("img_numpy shape:", img_numpy.shape)
         
         img_dev_ptr, img_buf_size = self.transfer_img_to_device(img_numpy)

@@ -43,12 +43,13 @@ class Vdec():
         check_ret("acl.util.start_thread", ret)
 
         self.init_resource()
+        self.dev2host_t = []
+        self.host2dev_t = []
         
     def __del__(self):
         print('[VDEC] release source stage:')
 
-
-        # self._destroy_resource()
+        self.destroy_resource()
         # ret = acl.finalize()
 #         check_ret("acl.finalize", ret)
         print('[VDEC] release source stage success')
@@ -89,6 +90,7 @@ class Vdec():
             # self.images_buffer.append(dict({"buffer": vdec_out_buffer,
             #                                 "size": data_size}))
             
+            begin = time.time()
             self.decoded_img_ptr_host, ret = acl.rt.malloc_host(self.decoded_img_buf_size)
             check_ret("acl.rt.malloc_host", ret)
 
@@ -96,6 +98,8 @@ class Vdec():
             check_ret("acl.rt.memcpy", ret)
             
             decoded_img = acl.util.ptr_to_numpy(self.decoded_img_ptr_host, (data_size, ), 2)
+            end = time.time()
+            self.dev2host_t.append(end-begin)
             self.images_buffer.append(decoded_img)
             
             ret = acl.media.dvpp_free(vdec_out_buffer)
@@ -175,7 +179,8 @@ class Vdec():
     def run(self, video_path):
         self.video_path = video_path        
         self.images_buffer = []
-
+        self.dev2host_t = []
+        self.host2dev_t = []
         
         # ret = acl.rt.subscribe_report(self.cb_thread_id, self.stream)
         # check_ret("acl.rt.subscribe_report", ret)
@@ -189,6 +194,8 @@ class Vdec():
             ret, frame = cap.read()
             if ret:
                 frame_size = frame.shape[1]
+                
+                begin = time.time()
                 frame_host_ptr = acl.util.numpy_to_ptr(frame)
                 frame_dev_ptr, ret = acl.media.dvpp_malloc(frame_size)
                 check_ret("acl.media.dvpp_malloc", ret)
@@ -198,7 +205,8 @@ class Vdec():
                                     frame_size,
                                     ACL_MEMCPY_HOST_TO_DEVICE)
                 check_ret("acl.rt.memcpy", ret)
-                
+                end = time.time()
+                self.host2dev_t.append(end-begin)
                 self._set_pic_input(frame_dev_ptr, frame_size)
                 self._set_pic_output()
                 
@@ -209,6 +217,9 @@ class Vdec():
                                                 self.frame_config,
                                                 None)
                 check_ret("acl.media.vdec_send_frame", ret)
+                self.read_frame_cnt += 1
+                # if self.read_frame_cnt >= 100:
+                #     break
                 # print("sent %d frame(s)" % self.read_frame_cnt)
             else:
                 break

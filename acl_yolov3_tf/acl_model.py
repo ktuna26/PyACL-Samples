@@ -10,7 +10,7 @@ import numpy as np
 from constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
     ACL_MEMCPY_HOST_TO_DEVICE, ACL_MEMCPY_DEVICE_TO_HOST, \
     ACL_ERROR_NONE, NPY_BYTE
-from acl_util import check_ret
+from acl_util import check_ret, letterbox_resize
 import cv2
 from postprocessing import postprocess_boxes, nms, get_model_output_by_index
 
@@ -65,7 +65,9 @@ class Model(object):
 
     def init_resource(self):
         print("[ACL] init resource stage:")
-        acl.init()
+        ret = acl.init()
+#         check_ret("acl.init", ret)
+        
         ret = acl.rt.set_device(self.device_id)
         check_ret("acl.rt.set_device", ret)
 
@@ -146,7 +148,9 @@ class Model(object):
 
     def run(self, img):
         
-        img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1] 
+        # img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1] 
+        img_resized = letterbox_resize(img, self.model_input_width, self.model_input_height)[:, :, ::-1]
+        img_resized = np.ascontiguousarray(img_resized)
         img_dev_ptr, img_buf_size = self.transfer_img_to_device(img_resized)
 #         print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
         self._gen_input_dataset(img_dev_ptr, img_buf_size)

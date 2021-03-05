@@ -11,3 +11,6 @@ build
 *.so
 *.o
 *.pb
+*.run
+*.mp4
+*.onnx
