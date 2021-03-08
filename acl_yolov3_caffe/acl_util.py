@@ -1,4 +1,4 @@
-from .constant import ACL_ERROR_NONE
+from constant import ACL_ERROR_NONE
 import cv2
 import numpy as np
 

@@ -7,10 +7,10 @@ MODIFIED: 2020-6-28 14:04:45
 import acl
 import struct
 import numpy as np
-from .constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
+from constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
     ACL_MEMCPY_HOST_TO_DEVICE, ACL_MEMCPY_DEVICE_TO_HOST, \
     ACL_ERROR_NONE, NPY_BYTE
-from .acl_util import check_ret, letterbox_resize
+from acl_util import check_ret, letterbox_resize
 import cv2
 from time import time
 
@@ -68,41 +68,28 @@ class Model(object):
 
     def init_resource(self):
         print("[ACL] init resource stage:")
-#         acl.init()
-        t1 = time()
+        ret = acl.init()
         ret = acl.rt.set_device(self.device_id)
         check_ret("acl.rt.set_device", ret)
-        print("part set_device takes ", time()-t1)
         
-#         t1 = time()
-#         self.context, ret = acl.rt.create_context(self.device_id)
-#         check_ret("acl.rt.create_context", ret)
-#         print("part create_context takes ", time()-t1)
+        self.context, ret = acl.rt.create_context(self.device_id)
+        check_ret("acl.rt.create_context", ret)
         
-#         t1 = time()
-#         self.stream, ret = acl.rt.create_stream()
-#         check_ret("acl.rt.create_stream", ret)
-#         print("part create_stream takes ", time()-t1)
-#         print("[ACL] init resource stage success")
+        self.stream, ret = acl.rt.create_stream()
+        check_ret("acl.rt.create_stream", ret)
+        print("[ACL] init resource stage success")
         
-#         print("[Model] class Model init resource stage:")
-#         # context
-#         t1 = time()
-#         acl.rt.set_context(self.context)
-#         print("part set_context takes ", time()-t1)
+        print("[Model] class Model init resource stage:")
+        # context
+        acl.rt.set_context(self.context)
         # load_model
-        t1 = time()
         self.model_id, ret = acl.mdl.load_from_file(self.model_path)
         check_ret("acl.mdl.load_from_file", ret)
-        print("part load_from_file takes ", time()-t1)
         
-        t1 = time()
         self.model_desc = acl.mdl.create_desc()
         ret = acl.mdl.get_desc(self.model_desc, self.model_id)
         check_ret("acl.mdl.get_desc", ret)
-        print("part get_desc takes ", time()-t1)
         
-        t1 = time()
         input_size = acl.mdl.get_num_inputs(self.model_desc)
         input1_size = acl.mdl.get_input_size_by_index(self.model_desc, 1)
         
@@ -112,12 +99,9 @@ class Model(object):
         self.input1_dataset_buffer = acl.create_data_buffer(
             self.input1_buffer,
             input1_size)
-        print("part create_data_buffer takes ", time()-t1)
         
-        t1 = time()
         output_size = acl.mdl.get_num_outputs(self.model_desc)
         self._gen_output_dataset(output_size)
-        print("part _gen_output_dataset takes ", time()-t1)
         
         print("model input size", input_size)
         for i in range(input_size):
