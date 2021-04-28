@@ -1,25 +1,24 @@
-# Tensorflow YoloV3 Object Detection
+# Tensorflow Deepface (ArcFace)
 Please open the jupyter notebook for a quick demo.
 
 ## Original Network Link
 
-https://github.com/YunYang1994/tensorflow-yolov3
+https://github.com/serengil/deepface
 
 ## Pre-trained Model Link:
 
-Download the frozen PB file of tensorflow yolov3 from this link,
-- https://www.huaweicloud.com/intl/en-us/ascend/resources/modelzoo/Models/5c3ec43f66ba455a9992fff905c6d687
-- Upload the pb file to `model` directory
+Download the h5 file according to the instructions in the original repo.
 
 ## Convert model To Ascend om file
 
+The h5 file should be first converted to ONNX format and then be converted to OM format.
+
 ```bash
 cd ./model
-atc --model=yolov3_tf.pb \
-    --framework=3 \
-    --input_shape="input/input_data:1,416,416,3" \
-    --output=./yolov3_coco_tf_rgb888 \
-    --insert_op_conf=./aipp_yolov3_tf.cfg \
-    --soc_version=Ascend310 \
-    --out_nodes="pred_sbbox/concat_2:0;pred_mbbox/concat_2:0;pred_lbbox/concat_2:0"
+atc --model=arcface.onnx \
+    --framework=5 \
+    --input_shape="your_model_input_name:1,112,112,3" \
+    --output=./arcface \
+    --soc_version={Ascend310, Ascend910A} \
+    --out_nodes="embedding:0"
 ```
