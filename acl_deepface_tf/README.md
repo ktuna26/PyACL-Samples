@@ -11,7 +11,7 @@ Download the h5 file according to the instructions in the original repo.
 
 ## Convert model To Ascend om file
 
-The h5 file should be first converted to ONNX format and then be converted to OM format.
+The h5 file should be first converted to ONNX format (opset 11) and then be converted to OM format.
 
 ```bash
 cd ./model
