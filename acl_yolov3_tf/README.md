@@ -20,6 +20,6 @@ atc --model=yolov3_tf.pb \
     --input_shape="input/input_data:1,416,416,3" \
     --output=./yolov3_coco_tf_rgb888 \
     --insert_op_conf=./aipp_yolov3_tf.cfg \
-    --soc_version=Ascend310 \
+    --soc_version={Ascend310, Ascend910}\
     --out_nodes="pred_sbbox/concat_2:0;pred_mbbox/concat_2:0;pred_lbbox/concat_2:0"
 ```
