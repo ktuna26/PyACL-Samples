@@ -1,0 +1,11 @@
+# pip install -U -r requirements.txt
+Cython
+opencv-python-headless
+matplotlib
+pillow
+tensorboard
+PyYAML>=5.3
+scipy
+tqdm
+onnx
+onnx-simplifier

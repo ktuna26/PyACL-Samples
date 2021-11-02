@@ -1,10 +1,9 @@
 """
-Copyright 2021 Huawei Technologies Co., Ltd
-
+Copyright (R) @huawei.com, all rights reserved
+-*- coding:utf-8 -*-
 CREATED:  2020-6-04 20:12:13
-MODIFIED: 2021-11-02 23:48:45
+MODIFIED: 2020-6-06 14:04:45
 """
-
 # error code
 ACL_ERROR_NONE = 0
 
