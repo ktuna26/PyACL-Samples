@@ -23,7 +23,5 @@ net.eval()
 # load data
 img = torch.zeros((1, 3, 736, 1280)) # BCHW
 
-from collections import OrderedDict
-
 # trace export
 torch.onnx.export(net, img, 'craft.onnx', export_params=True, verbose=True, opset_version=11)
