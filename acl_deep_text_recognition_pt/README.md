@@ -6,7 +6,7 @@ Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https:/
 
 Using this framework, texts detected by [PyTorch-CRAFT](https://gitee.com/tianyu__zhou/pyacl_samples/tree/a800/acl_craft_pt) can identification.
 
-<img width="1000" alt="teaser" src="./figures/deep_text_reco.jpg">
+<img width="100" alt="teaser" src="./figures/deep_text_reco.jpg">
 
 ## Getting started
 Install dependencies;
@@ -49,6 +49,7 @@ Finaly, open `jupyter-notebook` and run the code for demo
 
 ## Resources
 [1] https://github.com/axinc-ai/ailia-models/issues/302
+
 [2] https://colab.research.google.com/github/tulasiram58827/ocr_tflite/blob/main/colabs/Deep_Text_Recognition_TFLite.ipynb#scrollTo=OzhcDAc5kvJK
+
 [3] https://github.com/clovaai/deep-text-recognition-benchmark/issues/76
-[4]
