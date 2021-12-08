@@ -31,20 +31,22 @@ def normalizeMeanVariance(in_img, mean=(0.485, 0.456, 0.406), variance=(0.229, 0
 
 
 def resize_aspect_ratio(img, square_size, interpolation, mag_ratio=1):
-    height, width, channel = img.shape
+    # resize and get dimensions
+    before_h, before_w, _ = img.shape
+    img = cv2.resize(img, dsize=(square_size[0], square_size[1]), interpolation = interpolation)
+    after_h, after_w, chanel = img.shape
 
     # magnify image size
-    target_size = mag_ratio * max(height, width)
+    target_size = mag_ratio * max(after_h, after_w)
 
     # set original image size
-    if target_size > square_size:
-        target_size = square_size
+    if target_size > square_size[0]:
+        target_size = square_size[0]
     
-    ratio = target_size / max(height, width)    
+    ratio = target_size / max(after_h, after_w)    
 
-    target_h, target_w = int(height * ratio), int(width * ratio)
+    target_h, target_w = int(after_h * ratio), int(after_w * ratio)
     proc = cv2.resize(img, (target_w, target_h), interpolation = interpolation)
-
 
     # make canvas and paste image
     target_h32, target_w32 = target_h, target_w
@@ -52,13 +54,14 @@ def resize_aspect_ratio(img, square_size, interpolation, mag_ratio=1):
         target_h32 = target_h + (32 - target_h % 32)
     if target_w % 32 != 0:
         target_w32 = target_w + (32 - target_w % 32)
-    resized = np.zeros((target_h32, target_w32, channel), dtype=np.float32)
+    resized = np.zeros((target_h32, target_w32, chanel), dtype=np.float32)
     resized[0:target_h, 0:target_w, :] = proc
-    target_h, target_w = target_h32, target_w32
 
-    size_heatmap = (int(target_w/2), int(target_h/2))
-
-    return resized, ratio, size_heatmap
+    # calculate aspect for each dimension
+    ratio_w = 1 / (square_size[0] / before_w)
+    ratio_h =  1 / (square_size[1] / before_h)
+    
+    return resized, ratio_h, ratio_w
 
 
 def cvt2HeatmapImg(img):

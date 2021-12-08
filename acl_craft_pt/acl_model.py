@@ -133,8 +133,8 @@ class Model(object):
         
         # resize
         mag_ratio = round((self.model_input_width / self.model_input_height), 1)
-        img_resized, target_ratio, size_heatmap = resize_aspect_ratio(image, self.model_input_width, interpolation, mag_ratio)
-        ratio_h = ratio_w = 1 / target_ratio
+        img_resized,  ratio_h, ratio_w = resize_aspect_ratio(image, (self.model_input_width, 
+                                                                                             self.model_input_height), interpolation, mag_ratio)
 
         # preprocessing
         x = normalizeMeanVariance(img_resized)
