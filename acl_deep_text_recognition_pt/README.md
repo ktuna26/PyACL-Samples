@@ -27,8 +27,8 @@ And then use in the same directory atc tool to convert `ONNX ` file to `OM` file
 ```bash
 atc --model=None-ResNet-None-CTC.onnx \
     --framework=5 \
-    --output=None-ResNet-None-CTC 
-    --soc_version=Ascend310 \
+    --output=None-ResNet-None-CTC \
+    --soc_version=Ascend310
 ```
 
 Finaly, open `jupyter-notebook` and run the code for demo
