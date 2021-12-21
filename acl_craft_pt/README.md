@@ -25,7 +25,7 @@ And then use in the same directory atc tool to convert `ONNX ` file to `OM` file
 ```bash
 atc --model=craft.onnx \
     --framework=5 \
-    --output=craft 
+    --output=craft \
     --soc_version=Ascend310 \
     --precision_mode=allow_fp32_to_fp16
 ```
