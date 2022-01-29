@@ -8,7 +8,7 @@ BlazeFace is a fast, light-weight face detector from Google Research | [Read mor
 `PyTorch` implementation for **Mediapipe** face detector that effectively detect face area by exploring 6 keypoints (2x eyes, 2x ears, nose, mouth) for face landmarks.
 The BlazePaper paper mentions that there are two versions of the model, one for the front-facing camera and one for the back-facing camera. This repo includes only the backend camera model
 
-<img width="1000" alt="teaser" src="./figures/face_detection_android_gpu.gif">
+<img alt="teaser" src="./figures/face_detection_android_gpu.gif">
 
 ## Getting started
 Install dependencies;
