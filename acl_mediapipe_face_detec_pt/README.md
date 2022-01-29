@@ -2,7 +2,7 @@
 Please open the `jupyter-notebook` for a quick demo!
 BlazeFace is a fast, light-weight face detector from Google Research | [Read more](https://sites.google.com/view/perception-cv4arvr/blazeface) | [Paper on arXiv](https://arxiv.org/abs/1907.05047) | [Pretrained Model](https://github.com/google/mediapipe/blob/v0.7.12/mediapipe/models/face_detection_back.tflite)
 
-<img alt="teaser" src="./figures/mediapipe_smal.png">
+<img alt="teaser" src="./figures/mediapipe_small.png">
 
 ## Overview
 `PyTorch` implementation for **Mediapipe** face detector that effectively detect face area by exploring 6 keypoints (2x eyes, 2x ears, nose, mouth) for face landmarks.
