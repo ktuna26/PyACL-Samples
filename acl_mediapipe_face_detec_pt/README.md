@@ -1,7 +1,7 @@
 # PyTorch Mediapipe Face Detection (BlazeFace)
 Please open the `jupyter-notebook` for a quick demo!
 
-BlazeFace is a fast, light-weight face detector from Google Research | [Read more](https://sites.google.com/view/perception-cv4arvr/blazeface) | [Paper on arXiv](https://arxiv.org/abs/1907.05047) | [Pretrained Model](https://github.com/google/mediapipe/blob/v0.7.12/mediapipe/models/face_detection_back.tflite)
+BlazeFace is a fast, light-weight face detector from Google Research | [Read More](https://sites.google.com/view/perception-cv4arvr/blazeface) | [Paper](https://arxiv.org/abs/1907.05047) | [Pretrained Model](https://github.com/google/mediapipe/blob/v0.7.12/mediapipe/models/face_detection_back.tflite)
 
 <img alt="teaser" src="./figures/mediapipe_small.png">
 
