@@ -1,4 +1,7 @@
 *.om
+*.pth
+*.h5
+*.tflite
 __pycache__
 kernel_meta
 *.bin
