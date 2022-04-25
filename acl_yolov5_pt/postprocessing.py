@@ -42,7 +42,7 @@ def resize_image(img, size):
 
     return cv2.resize(mask, size, interpolation)
 
-def letterbox(img, new_shape=(640, 640), color=(128, 128, 128), auto=True, scaleFill=False, scaleup=True):
+def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True):
     # Resize image to a 32-pixel-multiple rectangle https://github.com/ultralytics/yolov3/issues/232
     shape = img.shape[:2]  # current shape [height, width]
     if isinstance(new_shape, int):
@@ -57,6 +57,12 @@ def letterbox(img, new_shape=(640, 640), color=(128, 128, 128), auto=True, scale
     ratio = r, r  # width, height ratios
     new_unpad = int(round(shape[1] * r)), int(round(shape[0] * r))
     dw, dh = new_shape[1] - new_unpad[0], new_shape[0] - new_unpad[1]  # wh padding
+    # if auto:  # minimum rectangle
+        # dw, dh = np.mod(dw, 64), np.mod(dh, 64)  # wh padding
+    # elif scaleFill:  # stretch
+        # dw, dh = 0.0, 0.0
+        # new_unpad = (new_shape[1], new_shape[0])
+        # ratio = new_shape[1] / shape[1], new_shape[0] / shape[0]  # width, height ratios
 
     dw /= 2  # divide padding into 2 sides
     dh /= 2
@@ -83,7 +89,8 @@ def get_model_output_by_index(model_output, i):
     acl.rt.memcpy(output_host, infer_output_size, infer_output_ptr,
                           infer_output_size, ACL_MEMCPY_DEVICE_TO_HOST)
 
-    return acl.util.ptr_to_numpy(output_host, (infer_output_size//4,), 11)
+    # https://support.huawei.com/enterprise/en/doc/EDOC1100206687/495fa7b/function-ptr_to_numpy
+    return acl.util.ptr_to_numpy(output_host, (infer_output_size//2,), 23)
 
 def _make_grid(nx=20, ny=20):
     xv, yv = np.meshgrid(np.arange(nx), np.arange(ny))
@@ -104,6 +111,7 @@ def detect(x, c, model_type="yolov5"):
     for i in range(3):
         _, _, ny, nx, _ =  x[i].shape
         grid.append(_make_grid(nx, ny))
+
     if model_type == 'yolov5':
         stride =  np.array([8, 16, 32])
         anchor_grid = np.array(
@@ -115,11 +123,15 @@ def detect(x, c, model_type="yolov5"):
             [[116, 90, 156, 198, 373, 326], [30, 61, 62, 45, 59, 119], [10., 13, 16, 30, 33, 23]])\
             .reshape(3, 1, 3, 1, 1, 2)
 
+    t = time.time()
     for i in range(3):
-        y = sigmoid(x[i])
+        y = sigmoid(x[i].astype(np.float32))
+        # y = x[i]
         y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + grid[i]) * stride[i]  # xy
         y[..., 2:4] = (y[..., 2:4] * 2) ** 2 * anchor_grid[i]  # wh
         z.append(y.reshape(1, -1, c))
+
+    # print("For loop takes", time.time()-t)
     return np.concatenate(z, 1)
 
 

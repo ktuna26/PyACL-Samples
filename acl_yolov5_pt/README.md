@@ -28,3 +28,15 @@ atc --model=modify_yolov5s.onnx \
     --input_shape="images:1,12,320,320" \
     --out_nodes="Reshape_259:0;Reshape_275:0;Reshape_291:0"
 ```
+```
+atc --model=yolov5s_sim_t.onnx \
+    --framework=5 \
+    --output=yolov5s_aipp \
+    --input_format=NCHW \
+    --log=error \
+    --soc_version=Ascend310 \
+    --input_shape="images:1,3,640,640" \
+    --enable_small_channel=1 \
+    --output_type=FP16 \
+    --insert_op_conf=aipp.cfg
+```
