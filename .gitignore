@@ -17,3 +17,5 @@ build
 *.run
 *.mp4
 *.onnx
+*.pt
+*.json

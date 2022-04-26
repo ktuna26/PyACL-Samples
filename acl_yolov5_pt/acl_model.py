@@ -125,19 +125,10 @@ class Model(object):
         return img_dev_ptr, img_buf_size
     
     def run1(self, img):
+        # print("self.model_input_width, self.model_input_height", self.model_input_width, self.model_input_height)
         self.img = letterbox(img, (self.model_input_width, self.model_input_height))[0]
-        # self.img = self.img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x640x640
         self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
-        # image_np = np.array(self.img, dtype=np.float32)
-        # image_np /= 255.0
-        # image_np = image_np.astype(np.float16)
         image_np = self.img
-        # image_np_expanded = np.expand_dims(image_np, axis=0)  # NCHW
-        # Focus
-        # img_numpy = focus_process(image_np_expanded)
-        # img_numpy = image_np_expanded
-        # print("image_np_expanded shape:", img_numpy.shape)
-        # img_numpy = np.ascontiguousarray(img_numpy)
         
         img_dev_ptr, img_buf_size = self.transfer_img_to_device(image_np)
 #         print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
@@ -166,7 +157,7 @@ class Model(object):
         print("detect takes", time.time()-t)
         t = time.time()
         # Apply NMS
-        pred = non_max_suppression(res_tensor, conf_thres=0.33, iou_thres=0.5, classes=None, agnostic=False)
+        pred = non_max_suppression(res_tensor, conf_thres=0.4, iou_thres=0.5, classes=None, agnostic=False)
         print("nms takes", time.time()-t)
         t = time.time()
         # Process detections
@@ -182,49 +173,6 @@ class Model(object):
             else:
                 pass
         print("the rest takes", time.time()-t)
-        return bboxes
-    
-    def run(self, img):
-        
-        img_resized = resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1]
-        img_resized = (img_resized/255).astype(np.float32)
-        img_resized = img_resized.transpose(2, 0, 1)
-        
-        img_resized = np.expand_dims(img_resized, axis=0)
-        print("----", img_resized.shape)
-        
-        img_focused = focus_process(img_resized)
-        print("----", img_focused.shape)
-        
-        img_dev_ptr, img_buf_size = self.transfer_img_to_device(img_focused)
-#         print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
-        self._gen_input_dataset(img_dev_ptr, img_buf_size)
-        self.forward()
-        
-        ret = acl.rt.free(img_dev_ptr)
-        check_ret("acl.rt.free", ret)
-        
-        
-        pred_sbbox = get_model_output_by_index(self.output_data, 0)
-        pred_mbbox = get_model_output_by_index(self.output_data, 1)
-        pred_lbbox = get_model_output_by_index(self.output_data, 2)
-        
-        
-        
-        return [pred_sbbox, pred_mbbox, pred_lbbox]
-#         return []
-        self.pred_bbox = np.concatenate([pred_sbbox, \
-                                    pred_mbbox, \
-                                    pred_lbbox], axis=-1)
-        
-        print("pred_bbox shape", self.pred_bbox.shape)
-        original_image_size = img.shape[:2]
-        print("original_image_size", original_image_size)
-#         bboxes = postprocess_boxes(self.pred_bbox, original_image_size, self.model_input_width, 0.3)
-#         print(bboxes)
-#         bboxes = nms(bboxes, 0.3, method='nms')
-#         print(bboxes)
-        return []
         return bboxes
 
     def forward(self):
