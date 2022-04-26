@@ -6,12 +6,13 @@ Usage:
   $ export PYTHONPATH="$PWD" && python export.py --weights ./weights/yolov5s.pt --img 640 --batch 1 --simplify
 
 CREATED:  2020-6-04 20:12:13
-MODIFIED: 2021-11-01 01:48:45
+MODIFIED: 2022-03-25 19:48:45
 """
-
 # -*- coding:utf-8 -*-
 import argparse
 import torch
+
+from pathlib import Path
 
 
 def file_size(path):
@@ -49,16 +50,19 @@ if __name__ == '__main__':
         import onnx
 
         print('\nStarting ONNX export with onnx %s...' % onnx.__version__)
-        f = opt.weights.replace('.pt', '.onnx')  # filename
+        f0 = opt.weights.replace('.pt', '')  # filename
+        f1 = f0 + ".onnx"
+        f2 = f0 + "_sim.onnx"
+
         model.fuse()  # only for ONNX
-        torch.onnx.export(model, img, f, verbose=False, opset_version=11, input_names=['images'],
+        torch.onnx.export(model, img, f1, verbose=False, opset_version=11, input_names=['images'],
                           output_names=['classes', 'boxes'] if y is None else ['output'])
 
         # Checks
-        onnx_model = onnx.load(f)  # load onnx model
+        onnx_model = onnx.load(f1)  # load onnx model
         onnx.checker.check_model(onnx_model)  # check onnx model
         print(onnx.helper.printable_graph(onnx_model.graph))  # print a human readable model
-        print('ONNX export success, saved as %s' % f)
+        print('ONNX export success, saved as %s' % f1)
 
          # Simplify
         if opt.simplify:
@@ -66,14 +70,13 @@ if __name__ == '__main__':
                 import onnxsim
 
                 print(f'ONNX: simplifying with onnx-simplifier {onnxsim.__version__}...')
-                onnx_model, check = onnxsim.simplify(
-                    onnx_model)
+                onnx_model, check = onnxsim.simplify(onnx_model,
+                                                    perform_optimization=False)
                 assert check, 'assert check failed'
-                onnx.save(onnx_model, f)
+                onnx.save(onnx_model, f2)
             except Exception as e:
                 print(f'ONNX: simplifier failure: {e}')
-        print(f'ONNX: export success, saved as {f} ({file_size(f):.1f} MB)')
-        print(f"ONNX: run --dynamic ONNX model inference with: 'python detect.py --weights {f}'")
+        print(f'ONNX: export success, saved as {f2} ({file_size(f2):.1f} MB)')
     except Exception as e:
         print('ONNX export failure: %s' % e)
 

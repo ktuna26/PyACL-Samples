@@ -33,8 +33,8 @@ class Model(object):
         self.input0_dataset_buffer = None
         self.input1_dataset_buffer = None
         self.input1_buffer = None
-        self.model_input_width = 640
-        self.model_input_height = 640
+        self.model_input_width = None
+        self.model_input_height = None
         self.input_dataset = None
         self.yolo_shapes= []
         self.element_number = None
@@ -98,7 +98,7 @@ class Model(object):
             print("input ", i)
             print("model input dims", acl.mdl.get_input_dims(self.model_desc, i))
             print("model input datatype", acl.mdl.get_input_data_type(self.model_desc, i))
-            # self.model_input_height, self.model_input_width = (i for i in acl.mdl.get_input_dims(self.model_desc, i)[0]['dims'][2:])
+            self.model_input_height, self.model_input_width = (i for i in acl.mdl.get_input_dims(self.model_desc, i)[0]['dims'][1:3])
         print("=" * 50)
         print("model output size", output_size)
         for i in range(output_size):

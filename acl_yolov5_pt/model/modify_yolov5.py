@@ -11,35 +11,147 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+'''
+    Usage:
+        $ python3 modify_yolov5.py yolov5s_sim.onnx
+'''
+import sys
 import onnx
 
-model = onnx.load("yolov5s.onnx")
+INT_MAX = sys.maxsize
 
-prob_info = onnx.helper.make_tensor_value_info('images', onnx.TensorProto.FLOAT, [-1, 12, 320, 320])
-model.graph.input.remove(model.graph.input[0])
-model.graph.input.insert(0, prob_info)
-model.graph.node[41].input[0] = 'images'
+if len(sys.argv) == 1:
+    print("usage: python3.7 modify_yolov5.py model.onnx [n,c,h,w]")
+    exit(0)
 
-node_list = ["Concat_40"]
+model_path = sys.argv[1]
+model = onnx.load(model_path)
 
-slice_node = ["Slice_4", "Slice_14", "Slice_24", "Slice_34", "Slice_9", "Slice_19", "Slice_29", "Slice_39", ]
-node_list.extend(slice_node)
-
-max_idx = len(model.graph.node)
-rm_cnt = 0
-for i in range(len(model.graph.node)):
-    if i < max_idx:
-        n = model.graph.node[i - rm_cnt]
-        if n.op_type == "Transpose":
-            print(n.name)
-        if n.name in node_list:
-            print("remove {} total {}".format(n.name, len(model.graph.node)))
-            model.graph.node.remove(n)
-            max_idx -= 1
-            rm_cnt += 1
+b, c, h, w = 1, 3, 640, 640
+if len(sys.argv) == 3:
+    b, c, h, w = list(map(int, sys.argv[2].split(',')))
+    print(f"input shape: {b, c, h, w}")
 
 
-onnx.checker.check_model(model)
+def get_node_by_name(nodes, name):
+    for n in nodes:
+        if n.name == name:
+            return n
+    return -1
 
-onnx.save(model, "modify_yolov5s.onnx")
+"""
+before:                           after:
+            input                             input
+    /      /      \      \                /           \
+slice4 slice14 slice24 slice34        slice4        slice14
+   |      |       |       |              |             |
+slice9 slice19 slice29 slice39           t              t
+    \      \      /       /           /    \         /     \
+            concat                slice9 slice29 slice19 slice39
+                                     |      |       |       |
+                                     t      t       t       t
+                                      \      \      /       /
+                                              concat
+"""
+
+model.graph.node.remove(get_node_by_name(model.graph.node, "Slice_24"))
+model.graph.node.remove(get_node_by_name(model.graph.node, "Slice_34"))
+
+prob_info1 = onnx.helper.make_tensor_value_info('to_slice9', onnx.TensorProto.FLOAT, [b, c, h, w//2])
+prob_info3 = onnx.helper.make_tensor_value_info('to_slice19', onnx.TensorProto.FLOAT, [b, c, h, w//2])
+prob_info5 = onnx.helper.make_tensor_value_info('from_slice9', onnx.TensorProto.FLOAT, [b, c, h//2, w//2])
+prob_info6 = onnx.helper.make_tensor_value_info('from_slice19', onnx.TensorProto.FLOAT, [b, c, h//2, w//2])
+prob_info7 = onnx.helper.make_tensor_value_info('from_slice29', onnx.TensorProto.FLOAT, [b, c, h//2, w//2])
+prob_info8 = onnx.helper.make_tensor_value_info('from_slice39', onnx.TensorProto.FLOAT, [b, c, h//2, w//2])
+
+# slice4 slice24 后的Transpose,若自定义模型，inputs中的编号需根据onnx图中实际编号修改
+node1 = onnx.helper.make_node(
+    'Transpose',
+    inputs=[get_node_by_name(model.graph.node, "Slice_4").output[0]],
+    outputs=['to_slice9'],
+    perm=[0, 1, 3, 2]
+)
+node3 = onnx.helper.make_node(
+    'Transpose',
+    inputs=[get_node_by_name(model.graph.node, "Slice_14").output[0]],
+    outputs=['to_slice19'],
+    perm=[0, 1, 3, 2]
+)
+# slice9 slice19 slice29 slice39后的Transpose
+node5 = onnx.helper.make_node(
+    'Transpose',
+    inputs=['from_slice9'],
+    outputs=[get_node_by_name(model.graph.node, "Slice_9").output[0]],
+    perm=[0, 1, 3, 2]
+)
+node6 = onnx.helper.make_node(
+    'Transpose',
+    inputs=['from_slice19'],
+    outputs=[get_node_by_name(model.graph.node, "Slice_19").output[0]],
+    perm=[0, 1, 3, 2]
+)
+node7 = onnx.helper.make_node(
+    'Transpose',
+    inputs=['from_slice29'],
+    outputs=[get_node_by_name(model.graph.node, "Slice_29").output[0]],
+    perm=[0, 1, 3, 2]
+)
+node8 = onnx.helper.make_node(
+    'Transpose',
+    inputs=['from_slice39'],
+    outputs=[get_node_by_name(model.graph.node, "Slice_39").output[0]],
+    perm=[0, 1, 3, 2]
+)
+model.graph.node.append(node1)
+model.graph.node.append(node3)
+model.graph.node.append(node5)
+model.graph.node.append(node6)
+model.graph.node.append(node7)
+model.graph.node.append(node8)
+
+# slice9 slice19 换轴
+model.graph.initializer.append(onnx.helper.make_tensor('starts_9', onnx.TensorProto.INT64, [1], [0]))
+model.graph.initializer.append(onnx.helper.make_tensor('ends_9', onnx.TensorProto.INT64, [1], [INT_MAX]))
+model.graph.initializer.append(onnx.helper.make_tensor('axes_9', onnx.TensorProto.INT64, [1], [2]))
+model.graph.initializer.append(onnx.helper.make_tensor('steps_9', onnx.TensorProto.INT64, [1], [2]))
+newnode1 = onnx.helper.make_node(
+    'Slice',
+    name='Slice_9',
+    inputs=['to_slice9', 'starts_9', 'ends_9', 'axes_9', 'steps_9'],
+    outputs=['from_slice9']
+)
+model.graph.node.remove(get_node_by_name(model.graph.node, "Slice_9"))
+model.graph.node.insert(9, newnode1)
+newnode2 = onnx.helper.make_node(
+    'Slice',
+    name='Slice_19',
+    inputs=['to_slice19', 'starts_9', 'ends_9', 'axes_9', 'steps_9'],
+    outputs=['from_slice19']
+)
+model.graph.node.remove(get_node_by_name(model.graph.node, "Slice_19"))
+model.graph.node.insert(19, newnode2)
+
+# slice29 slice39 换轴
+model.graph.initializer.append(onnx.helper.make_tensor('starts_29', onnx.TensorProto.INT64, [1], [1]))
+model.graph.initializer.append(onnx.helper.make_tensor('ends_29', onnx.TensorProto.INT64, [1], [INT_MAX]))
+model.graph.initializer.append(onnx.helper.make_tensor('axes_29', onnx.TensorProto.INT64, [1], [2]))
+model.graph.initializer.append(onnx.helper.make_tensor('steps_29', onnx.TensorProto.INT64, [1], [2]))
+newnode3 = onnx.helper.make_node(
+    'Slice',
+    name='Slice_29',
+    inputs=['to_slice9', 'starts_29', 'ends_29', 'axes_29', 'steps_29'],
+    outputs=['from_slice29']
+)
+model.graph.node.remove(get_node_by_name(model.graph.node, "Slice_29"))
+model.graph.node.insert(29, newnode3)
+newnode4 = onnx.helper.make_node(
+    'Slice',
+    name='Slice_39',
+    inputs=['to_slice19', 'starts_29', 'ends_29', 'axes_29', 'steps_29'],
+    outputs=['from_slice39']
+)
+model.graph.node.remove(get_node_by_name(model.graph.node, "Slice_39"))
+model.graph.node.insert(39, newnode4)
+
+onnx.save(model, model_path.split('.')[0] + "_t.onnx")
+print("success")

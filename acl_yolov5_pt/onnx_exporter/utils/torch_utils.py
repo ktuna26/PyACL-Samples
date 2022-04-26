@@ -21,12 +21,7 @@ def init_seeds(seed=0):
         cudnn.benchmark = True
 
 
-def select_device(device='', npu='', apex=False, batch_size=None):
-    npu_request = device.lower() == 'npu'
-    if npu_request and npu != -1:
-        torch.npu.set_device("npu:%d" % npu)
-        print('Using NPU %d to train' % npu)
-        return torch.device("npu:%d" % npu)
+def select_device(device='', apex=False, batch_size=None):
     # device = 'cpu' or '0' or '0,1,2,3'
     cpu_request = device.lower() == 'cpu'
     if device and not cpu_request:  # if device requested other than 'cpu'
@@ -145,28 +140,6 @@ def model_info(model, verbose=False):
     print('Model Summary: %g layers, %g parameters, %g gradients%s' % (len(list(model.parameters())), n_p, n_g, fs))
 
 
-def load_classifier(name='resnet101', n=2):
-    # Loads a pretrained model reshaped to n-class output
-    import torchvision.models as models
-    model = models.__dict__[name](pretrained=True)
-
-    # Display model properties
-    input_size = [3, 224, 224]
-    input_space = 'RGB'
-    input_range = [0, 1]
-    mean = [0.485, 0.456, 0.406]
-    std = [0.229, 0.224, 0.225]
-    for x in [input_size, input_space, input_range, mean, std]:
-        print(x + ' =', eval(x))
-
-    # Reshape output to n classes
-    filters = model.fc.weight.shape[1]
-    model.fc.bias = nn.Parameter(torch.zeros(n), requires_grad=True)
-    model.fc.weight = nn.Parameter(torch.zeros(n, filters), requires_grad=True)
-    model.fc.out_features = n
-    return model
-
-
 def scale_img(img, ratio=1.0, same_shape=False):  # img(16,3,256,416), r=ratio
     # scales img(bs,3,y,x) by ratio
     h, w = img.shape[2:]
@@ -204,60 +177,20 @@ class ModelEMA:
         #     self.ema.half()  # FP16 EMA
         self.updates = updates  # number of EMA updates
         self.decay = lambda x: decay * (1 - math.exp(-x / 2000))  # decay exponential ramp (to help early epochs)
-        device = ''
         for p in self.ema.parameters():
             p.requires_grad_(False)
-            device = p.device
 
-        if device.type == 'npu':
-            from tensor_fused_plugin import combine_npu
-            with torch.no_grad():
-                ema_param_buffer_list = []
-                for name, p in self.ema.named_parameters():
-                    if p.dtype.is_floating_point:
-                        ema_param_buffer_list.append(p)
-                    else:
-                        continue
-                
-                for name, b in self.ema.named_buffers():
-                    if b.dtype.is_floating_point:
-                        ema_param_buffer_list.append(b)
-                    else:
-                        continue
-                self.ema_merged = combine_npu(ema_param_buffer_list)
-
-                model_param_buffer_list = []
-                for name, p in model.named_parameters():
-                    if p.dtype.is_floating_point:
-                        model_param_buffer_list.append(p)
-                    else:
-                        continue
-                for name, b in model.named_buffers():
-                    if b.dtype.is_floating_point:
-                        model_param_buffer_list.append(b)
-                    else:
-                        continue
-                self.model_merged = combine_npu(model_param_buffer_list)
-
-
-    def update(self, model, x):
+    def update(self, model):
         # Update EMA parameters
         with torch.no_grad():
             self.updates += 1
             d = self.decay(self.updates)
 
-            if x.device.type == 'npu':
-                d_inv = 1. - d
-                d = torch.tensor([d], device=x.device)
-
-                self.ema_merged *= d
-                self.ema_merged.add_(self.model_merged, alpha=d_inv)
-            else:
-                msd = model.module.state_dict() if is_parallel(model) else model.state_dict()  # model state_dict
-                for k, v in self.ema.state_dict().items():
-                    if v.dtype.is_floating_point:
-                        v *= d
-                        v += (1. - d) * msd[k].detach()
+            msd = model.module.state_dict() if is_parallel(model) else model.state_dict()  # model state_dict
+            for k, v in self.ema.state_dict().items():
+                if v.dtype.is_floating_point:
+                    v *= d
+                    v += (1. - d) * msd[k].detach()
 
     def update_attr(self, model, include=(), exclude=('process_group', 'reducer')):
         # Update EMA attributes
