@@ -29,3 +29,14 @@ atc --model=modify_yolov5s.onnx \
     --input_shape="images:1,12,320,320" \
     --out_nodes="Reshape_259:0;Reshape_275:0;Reshape_291:0"
 ```
+```
+atc --model=yolov3_sim.onnx \
+    --framework=5 \
+    --output=yolov3_bs1_aipp \
+    --input_format=NCHW \
+    --soc_version=Ascend310 \
+    --input_shape="images:1,3,416,416" \
+    --out_nodes="Transpose_274:0;Transpose_258:0;Transpose_242:0" \
+    --insert_op_conf=aipp_yolov3.cfg\
+    --output_type=FP16
+```
