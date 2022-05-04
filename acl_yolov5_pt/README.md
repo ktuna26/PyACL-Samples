@@ -14,7 +14,8 @@ Download the PT file of from this link,
 
 ## PT model -> ONNX format -> Ascend om format
 ### PT -> ONNX
-Use the onnx_exporter/export.py script in this repository to convert PT file to ONNX file.
+Use the onnx_exporter/export.py script in this repository to convert PT file to ONNX file.  
+Use this step to convert  **yolov3.pt**  to  **yolov3_sim.onnx**. 
 
 ### Remove a few operators in the ONNX file
 The  **Slice** and  **Transpose** operators will slow down the model inference significantly. Use ./model/modify_yolov5.py script in this repo to remove the impact of these operators.
