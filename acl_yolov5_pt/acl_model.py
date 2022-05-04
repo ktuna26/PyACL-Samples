@@ -21,7 +21,8 @@ from postprocessing import get_model_output_by_index, letterbox, focus_process, 
 class Model(object):
     def __init__(self,
                  device_id,
-                 model_path):
+                 model_path,
+                 model_type="yolov5"):
         self.device_id = device_id
         self.model_path = model_path    # string
         self.model_id = None            # pointer
@@ -38,6 +39,7 @@ class Model(object):
         self.input_dataset = None
         self.yolo_shapes= []
         self.element_number = None
+        self.model_type = model_type
         self.init_resource()
         
 
@@ -153,7 +155,7 @@ class Model(object):
         t = time.time()
         # print("feature_maps shape", feature_maps[0].shape)
         # print("self.element_number", self.element_number)
-        res_tensor = detect(feature_maps, self.element_number)
+        res_tensor = detect(feature_maps, self.element_number, model_type=self.model_type)
         print("detect takes", time.time()-t)
         t = time.time()
         # Apply NMS
