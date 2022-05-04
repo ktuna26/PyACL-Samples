@@ -17,6 +17,10 @@ Download the PT file of from this link,
 Use the onnx_exporter/export.py script in this repository to convert PT file to ONNX file.  
 Use this step to convert  **yolov3.pt**  to  **yolov3_sim.onnx**. 
 
+```
+python onnx_exporter/export.py --weights model/yolov3.pt --img-size 416 --batch-size 1 --simplify
+```
+
 ### Remove a few operators in the ONNX file
 The  **Slice** and  **Transpose** operators will slow down the model inference significantly. Use ./model/modify_yolov5.py script in this repo to remove the impact of these operators.  
 This step is **NOT** needed for yolov3.
@@ -35,6 +39,8 @@ atc --model=yolov5s_sim_t.onnx \
     --output_type=FP16 \
     --insert_op_conf=aipp.cfg
 ```
+The **\-\-out_nodes** names can vary, adjust the parameter accordingly.
+
 ```
 atc --model=yolov3_sim.onnx \
     --framework=5 \
