@@ -39,7 +39,6 @@ atc --model=yolov5s_sim_t.onnx \
     --output_type=FP16 \
     --insert_op_conf=aipp.cfg
 ```
-The **\-\-out_nodes** names can vary, adjust the parameter accordingly.
 
 ```
 atc --model=yolov3_sim.onnx \
@@ -48,7 +47,6 @@ atc --model=yolov3_sim.onnx \
     --input_format=NCHW \
     --soc_version=Ascend310 \
     --input_shape="images:1,3,416,416" \
-    --out_nodes="Transpose_274:0;Transpose_258:0;Transpose_242:0" \
-    --insert_op_conf=aipp_yolov3.cfg\
+    --insert_op_conf=aipp_yolov3.cfg \
     --output_type=FP16
 ```
