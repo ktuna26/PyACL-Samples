@@ -9,7 +9,7 @@ https://github.com/ultralytics/yolov5
 ## Pre-trained Model Link:
 
 Download the PT file of from this link,
-- https://github.com/ultralytics/yolov5/releases/tag/v4.0
+- https://github.com/ultralytics/yolov5/releases/tag/v2.0
 - Upload the pt file to `model` directory
 
 ## PT model -> ONNX format -> Ascend om format
@@ -22,12 +22,16 @@ The  **Slice** and  **Transpose** operators will slow down the model inference s
 ### ONNX -> OM
 ```bash
 cd ./model
-atc --model=modify_yolov5s.onnx \
+atc --model=yolov5s_sim_t.onnx \
     --framework=5 \
-    --output=modify_yolov5s_out \
+    --output=yolov5s_sim_aipp \
+    --input_format=NCHW \
+    --log=error \
     --soc_version=Ascend310 \
-    --input_shape="images:1,12,320,320" \
-    --out_nodes="Reshape_259:0;Reshape_275:0;Reshape_291:0"
+    --input_shape="images:1,3,640,640" \
+    --enable_small_channel=1 \
+    --output_type=FP16 \
+    --insert_op_conf=aipp.cfg
 ```
 ```
 atc --model=yolov3_sim.onnx \
