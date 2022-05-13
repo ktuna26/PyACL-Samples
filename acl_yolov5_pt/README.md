@@ -50,3 +50,15 @@ atc --model=yolov3_sim.onnx \
     --insert_op_conf=aipp_yolov3.cfg \
     --output_type=FP16
 ```
+
+## Benchmark
+The benchmark is conducted on a Huawei Atlas 800 3010 X86 inference server (Ascend310) with CANN 21.0.2 and models from https://github.com/ultralytics/yolov5/releases/tag/v2.0 .
+
+The latency only covers the model inference (graph run), excluding YOLO post-processing
+
+| Model   | Latency (ms) |
+|---------|--------------|
+| yolov5s | 8.26         |
+| yolov5m | 13.47        |
+| yolov5l | 22.86        |
+| yolov5x | 35.96        |
