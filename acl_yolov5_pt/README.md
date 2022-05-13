@@ -54,7 +54,7 @@ atc --model=yolov3_sim.onnx \
 ## Benchmark
 The benchmark is conducted on a Huawei Atlas 800 3010 X86 inference server (Ascend310) with CANN 21.0.2 and models from https://github.com/ultralytics/yolov5/releases/tag/v2.0 .
 
-The latency only covers the model inference (graph run), excluding YOLO post-processing
+The latency only covers the model inference (graph run),  **EXCLUDING**  YOLO post-processing
 
 | Model   | Latency (ms) |
 |---------|--------------|
