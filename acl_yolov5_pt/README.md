@@ -40,7 +40,7 @@ atc --model=yolov5s_sim_t.onnx \
     --insert_op_conf=aipp.cfg
 ```
 
-```
+```bash
 atc --model=yolov3_sim.onnx \
     --framework=5 \
     --output=yolov3_bs1_aipp \
