@@ -96,6 +96,11 @@ class Model(object):
         custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("force_fp16")
         # Configuration 3: Select the graph run mode. Set this parameter to 0 in the inference scenario or retain the default value 1 in the training scenario.
         custom_op.parameter_map["graph_run_mode"].i = 0
+
+        # Whether you want dynamic input dimensions during execution
+        #custom_op.parameter_map["dynamic_input"].b = True
+        #custom_op.parameter_map["dynamic_graph_execute_mode"].s = tf.compat.as_bytes("lazy_recompile")
+
         # Configuration 4: Disable remapping and MemoryOptimizer.
         config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
         config.graph_options.rewrite_options.memory_optimization = RewriterConfig.OFF
