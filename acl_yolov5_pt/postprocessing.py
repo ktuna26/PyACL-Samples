@@ -90,7 +90,7 @@ def get_model_output_by_index(model_output, i):
                           infer_output_size, ACL_MEMCPY_DEVICE_TO_HOST)
 
     # https://support.huawei.com/enterprise/en/doc/EDOC1100206687/495fa7b/function-ptr_to_numpy
-    return acl.util.ptr_to_numpy(output_host, (infer_output_size//2,), 23)
+    return output_host, acl.util.ptr_to_numpy(output_host, (infer_output_size//2,), 23)
 
 def _make_grid(nx=20, ny=20):
     xv, yv = np.meshgrid(np.arange(nx), np.arange(ny))

@@ -123,7 +123,6 @@ class Model(object):
         check_ret("acl.rt.malloc", ret)
         ret = acl.rt.memcpy(img_dev_ptr, img_buf_size, img_host_ptr, img_buf_size, ACL_MEMCPY_HOST_TO_DEVICE)
         check_ret("acl.rt.memcpy", ret)
-        
         return img_dev_ptr, img_buf_size
     
     def run1(self, img):
@@ -135,18 +134,16 @@ class Model(object):
         img_dev_ptr, img_buf_size = self.transfer_img_to_device(image_np)
 #         print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
         self._gen_input_dataset(img_dev_ptr, img_buf_size)
-
         t = time.time()
         self.forward()
         print("inference takes", time.time()-t)
-        ret = acl.rt.free(img_dev_ptr)
-        check_ret("acl.rt.free", ret)
-        
+
         t = time.time()
-        pred_sbbox = get_model_output_by_index(self.output_data, 0)
-        pred_mbbox = get_model_output_by_index(self.output_data, 1)
-        pred_lbbox = get_model_output_by_index(self.output_data, 2)
+        host_buf_1, pred_sbbox = get_model_output_by_index(self.output_data, 0)
+        host_buf_2, pred_mbbox = get_model_output_by_index(self.output_data, 1)
+        host_buf_3, pred_lbbox = get_model_output_by_index(self.output_data, 2)
         feature_maps = [pred_sbbox, pred_mbbox, pred_lbbox]
+
         print("moving data takes", time.time()-t)
         # t = time.time()
         # print("self.yolo_shapes", self.yolo_shapes)
@@ -175,6 +172,15 @@ class Model(object):
             else:
                 pass
         print("the rest takes", time.time()-t)
+        t = time.time()
+        # self._release_dataset()
+        for host_buf in [host_buf_1, host_buf_2, host_buf_3]:
+            ret = acl.rt.free_host(host_buf)
+            check_ret("acl.rt.free_host", ret)
+        for feat_map in feature_maps:
+            del feat_map
+
+        print("resource release takes", time.time()-t)
         return bboxes
 
     def forward(self):
@@ -183,12 +189,16 @@ class Model(object):
                               self.input_dataset,
                               self.output_data)
         check_ret("acl.mdl.execute", ret)
-
         #free the input dataset
         if self.input0_dataset_buffer:
+            data_buf_addr = acl.get_data_buffer_addr(self.input0_dataset_buffer)
+            ret= acl.rt.free(data_buf_addr)
+            check_ret("acl.rt.free", ret)
+
             ret = acl.destroy_data_buffer(self.input0_dataset_buffer)
             check_ret("acl.destroy_data_buffer", ret)
             self.input0_dataset_buffer = None
+            
         if self.input_dataset:
             ret = acl.mdl.destroy_dataset(self.input_dataset)
             check_ret("acl.destroy_dataset", ret)
@@ -236,9 +246,18 @@ class Model(object):
             if not dataset:
                 continue
             num = acl.mdl.get_dataset_num_buffers(dataset)
+            # print("Removing %d buffers" % num)
             for i in range(num):
+                
                 data_buf = acl.mdl.get_dataset_buffer(dataset, i)
                 if data_buf:
+
+                    data_buf_addr = acl.get_data_buffer_addr(data_buf)
+                    data_buf_size = acl.get_data_buffer_size(data_buf)
+                    # print("index", i, "data_buf_size", data_buf_size)
+                    ret= acl.rt.free(data_buf_addr)
+                    check_ret("acl.rt.free", ret)
+                # if data_buf:
                     ret = acl.destroy_data_buffer(data_buf)
                     check_ret("acl.destroy_data_buffer", ret)
 
