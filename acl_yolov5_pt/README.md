@@ -83,4 +83,6 @@ The latency only covers the model inference (graph run),  **EXCLUDING**  YOLO po
 
 ### Jupyter Notebook Example Output
 
-<img src="/data/example.png" width=650>
+<img src="/pyacl_samples/acl_yolov5_pt/data/example.png" width=650>
+
+![Alt text](pyacl_samples/acl_yolov5_pt/data/example.png)
