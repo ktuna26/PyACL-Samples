@@ -62,8 +62,8 @@ Yolov5 v6.1 = https://github.com/ultralytics/yolov5/releases/tag/v6.1
 
 The latency only covers the model inference (graph run),  **EXCLUDING**  YOLO post-processing
 
-<img src="/data/9010_6vs2.png" width=650>
-<img src="/data/A800_3010_YOLO.png" width=650>
+<img src="pyacl_samples/data/9010_6vs2.png" width=650>
+<img src="pyacl_samples/data/A800_3010_YOLO.png" width=650>
 
 ##### Huawei Atlas 800 9010 X86 training server (Ascend910)
 | Model   | Latency (ms) (v2.0) |Latency (ms) (v6.1) |
