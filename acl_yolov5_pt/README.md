@@ -62,3 +62,5 @@ The latency only covers the model inference (graph run),  **EXCLUDING**  YOLO po
 | yolov5m | 13.47        |
 | yolov5l | 22.86        |
 | yolov5x | 35.96        |
+
+
