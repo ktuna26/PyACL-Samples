@@ -85,10 +85,5 @@ The latency only covers the model inference (graph run),  **EXCLUDING**  YOLO po
 
 ### Jupyter Notebook Example Output
 
-<<<<<<< HEAD
-<img src="./data/example.png" width=650>
-=======
 <img src="./data/example.png" width=650>
 
-
->>>>>>> refs/remotes/origin/a800
