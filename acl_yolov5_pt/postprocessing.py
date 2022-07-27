@@ -69,33 +69,33 @@ def xywh2xyxy(x):
     y[:, 1] = x[:, 1] - x[:, 3] / 2  # top left y
     y[:, 2] = x[:, 0] + x[:, 2] / 2  # bottom right x
     y[:, 3] = x[:, 1] + x[:, 3] / 2  # bottom right y
-
+    
     return y
 
 def nms(boxes, scores, iou_thres):
     # if there are no boxes, return an empty list
     if len(boxes) == 0:
         return np.zeros(1)
-
+    
     # if the bounding boxes integers, convert them to floats --
     # this is important since we'll be doing a bunch of divisions
     if boxes.dtype.kind == "i":
         boxes = boxes.astype("float32")
-
-    # initialize the list of picked indexes
+    
+    # initialize the list of picked indexes	
     pick = []
-
+    
     # grab the coordinates of the bounding boxes
     x1 = boxes[:,0]
     y1 = boxes[:,1]
     x2 = boxes[:,2]
     y2 = boxes[:,3]
-
+    
     # compute the area of the bounding boxes and sort the bounding
     # boxes by the bottom-right y-coordinate of the bounding box
     area = (x2 - x1 + 1) * (y2 - y1 + 1)
     idxs = np.argsort(scores)
-
+    
     # keep looping while some indexes still remain in the indexes
     # list
     while len(idxs) > 0:
@@ -104,7 +104,7 @@ def nms(boxes, scores, iou_thres):
         last = len(idxs) - 1
         i = idxs[last]
         pick.append(i)
-
+        
         # find the largest (x, y) coordinates for the start of
         # the bounding box and the smallest (x, y) coordinates
         # for the end of the bounding box
@@ -112,18 +112,18 @@ def nms(boxes, scores, iou_thres):
         yy1 = np.maximum(y1[i], y1[idxs[:last]])
         xx2 = np.minimum(x2[i], x2[idxs[:last]])
         yy2 = np.minimum(y2[i], y2[idxs[:last]])
-
+        
         # compute the width and height of the bounding box
         w = np.maximum(0, xx2 - xx1 + 1)
         h = np.maximum(0, yy2 - yy1 + 1)
-
+        
         # compute the ratio of overlap
         overlap = (w * h) / area[idxs[:last]]
-
+        
         # delete all indexes from the index list that have
         idxs = np.delete(idxs, np.concatenate(([last],
             np.where(overlap > iou_thres)[0])))
-
+        
     # return only picked value
     return np.array(pick)
 
@@ -164,7 +164,7 @@ def non_max_suppression(prediction, conf_thres=0.1, iou_thres=0.6, merge=False, 
         # Detections matrix nx6 (xyxy, conf, cls)
         i, j = np.nonzero(x[:, 5:] > conf_thres)
         x = np.concatenate((box[i], x[i, j + 5, None], j[:, None].astype('float32')), 1)
-
+            
         # Filter by class
         #if classes:
         #    x = x[(x[:, 5:6] == torch.tensor(classes, device=x.device)).any(1)]
@@ -177,7 +177,7 @@ def non_max_suppression(prediction, conf_thres=0.1, iou_thres=0.6, merge=False, 
         n = x.shape[0]  # number of boxes
         if not n:
             continue
-
+            
         # Sort by confidence
         # x = x[x[:, 4].argsort(descending=True)]
 
@@ -185,10 +185,10 @@ def non_max_suppression(prediction, conf_thres=0.1, iou_thres=0.6, merge=False, 
         c = x[:, 5:6] * (0 if agnostic else max_wh)  # classes
         boxes, scores = x[:, :4] + c, x[:, 4]  # boxes (offset by class), scores
         i = nms(boxes, scores, iou_thres)
-
+       
         if i.shape[0] > max_det:  # limit detections
             i = i[:max_det]
-
+            
         output[xi] = x[i]
         if (time.time() - t) > time_limit:
             break  # time limit exceeded
