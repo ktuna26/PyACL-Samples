@@ -41,7 +41,7 @@ class Model(object):
         self.element_number = None
         self.model_type = model_type
         self.init_resource()
-
+        
 
     def __del__(self):
         self._release_dataset()
@@ -58,7 +58,7 @@ class Model(object):
             check_ret("acl.rt.free", ret)
 
         print("[Model] class Model release source success")
-
+        
         if self.stream:
             acl.rt.destroy_stream(self.stream)
 
@@ -66,7 +66,7 @@ class Model(object):
             acl.rt.destroy_context(self.context)
         acl.rt.reset_device(self.device_id)
         acl.finalize()
-
+        
         print("[ACL] class Sample release source success")
 
     def init_resource(self):
@@ -81,7 +81,7 @@ class Model(object):
         self.stream, ret = acl.rt.create_stream()
         check_ret("acl.rt.create_stream", ret)
         print("[ACL] init resource stage success")
-
+        
         print("[Model] class Model init resource stage:")
         # context
         acl.rt.set_context(self.context)
@@ -91,7 +91,7 @@ class Model(object):
         self.model_desc = acl.mdl.create_desc()
         ret = acl.mdl.get_desc(self.model_desc, self.model_id)
         check_ret("acl.mdl.get_desc", ret)
-
+        
         input_size = acl.mdl.get_num_inputs(self.model_desc)
         output_size = acl.mdl.get_num_outputs(self.model_desc)
         self._gen_output_dataset(output_size)
@@ -110,9 +110,9 @@ class Model(object):
             self.model_output_height, self.model_output_width = acl.mdl.get_output_dims(self.model_desc, i)[0]['dims'][1:]
         print("=" * 50)
         print("[Model] class Model init resource stage success")
-
+   
     def transfer_img_to_device(self, img_resized):
-
+        
         # BGR to RGB
         img_host_ptr, _ = acl.util.numpy_contiguous_to_ptr(img_resized)
         # print(img_host_ptr)
@@ -123,13 +123,13 @@ class Model(object):
         ret = acl.rt.memcpy(img_dev_ptr, img_buf_size, img_host_ptr, img_buf_size, ACL_MEMCPY_HOST_TO_DEVICE)
         check_ret("acl.rt.memcpy", ret)
         return img_dev_ptr, img_buf_size
-
+    
     def run1(self, img):
         k = time.time()
         self.img = letterbox(img, (self.model_input_width, self.model_input_height))[0]
         self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
         image_np = self.img
-
+        
         img_dev_ptr, img_buf_size = self.transfer_img_to_device(image_np)
         self._gen_input_dataset(img_dev_ptr, img_buf_size)
         #t = time.time()
@@ -140,18 +140,18 @@ class Model(object):
 
         host_buf, feature_maps = get_model_output_by_index(self.output_data, 0)
         feature_maps =feature_maps.reshape(-1,self.model_output_height, self.model_output_width)
-
+        
         # Apply NMS
         # print(feature_maps)
         # print("Shape:",feature_maps.shape)
         pred = non_max_suppression(feature_maps, conf_thres=0.45, iou_thres=0.5, classes=None, agnostic=False)
-
+        
         #print("nms takes", time.time()-t)
         #t = time.time()
         # Process detections
         bboxes = []
         src_img = img
-
+        
         for i, det in enumerate(pred):  # detections per image
             # Rescale boxes from img_size to im0 size
             if det is not None:
@@ -162,7 +162,7 @@ class Model(object):
                 pass
         #print("the rest takes", time.time()-t)
         #t = time.time()
-
+        
         ret = acl.rt.free_host(host_buf)
         check_ret("acl.rt.free_host", ret)
         del feature_maps
@@ -185,7 +185,7 @@ class Model(object):
             ret = acl.destroy_data_buffer(self.input0_dataset_buffer)
             check_ret("acl.destroy_data_buffer", ret)
             self.input0_dataset_buffer = None
-
+            
         if self.input_dataset:
             ret = acl.mdl.destroy_dataset(self.input_dataset)
             check_ret("acl.destroy_dataset", ret)
@@ -227,7 +227,7 @@ class Model(object):
                 check_ret("acl.destroy_data_buffer", ret)
         self.output_data = dataset
         print("[Model] create model output dataset success")
-
+        
     def _release_dataset(self, ):
         for dataset in [self.input_dataset, self.output_data]:
             if not dataset:
@@ -235,7 +235,7 @@ class Model(object):
             num = acl.mdl.get_dataset_num_buffers(dataset)
             # print("Removing %d buffers" % num)
             for i in range(num):
-
+                
                 data_buf = acl.mdl.get_dataset_buffer(dataset, i)
                 if data_buf:
 
@@ -250,3 +250,4 @@ class Model(object):
 
             ret = acl.mdl.destroy_dataset(dataset)
             check_ret("acl.mdl.destroy_dataset", ret)
+
