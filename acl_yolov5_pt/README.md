@@ -84,5 +84,5 @@ Yolov5 v6.1 = https://github.com/ultralytics/yolov5/releases/tag/v6.1
 
 
 <p align="center">
-<img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" align="center" width="560" height="500"  />
+<img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" align="center"/>
 </p>
