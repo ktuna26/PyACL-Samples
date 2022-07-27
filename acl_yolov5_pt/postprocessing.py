@@ -15,33 +15,6 @@ from constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
     ACL_MEMCPY_HOST_TO_DEVICE, ACL_MEMCPY_DEVICE_TO_HOST, \
     ACL_ERROR_NONE, NPY_BYTE
 
-def resize_image(img, size):
-
-    h, w = img.shape[:2]
-    c = img.shape[2] if len(img.shape)>2 else 1
-
-    if h == w: 
-        return cv2.resize(img, size, cv2.INTER_AREA)
-
-    dif = h if h > w else w
-
-    interpolation = cv2.INTER_AREA if dif > (size[0]+size[1])//2 else \
-                    cv2.INTER_CUBIC
-
-    x_pos = (dif - w)//2
-    y_pos = (dif - h)//2
-
-    if len(img.shape) == 2:
-        mask = np.zeros((dif, dif), dtype=img.dtype)
-        mask.fill(128)
-        mask[y_pos:y_pos+h, x_pos:x_pos+w] = img[:h, :w]
-    else:
-        mask = np.zeros((dif, dif, c), dtype=img.dtype)
-        mask.fill(128)
-        mask[y_pos:y_pos+h, x_pos:x_pos+w, :] = img[:h, :w, :]
-
-    return cv2.resize(mask, size, interpolation)
-
 def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True):
     # Resize image to a 32-pixel-multiple rectangle https://github.com/ultralytics/yolov3/issues/232
     shape = img.shape[:2]  # current shape [height, width]
@@ -74,10 +47,6 @@ def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scale
     img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
     return img, ratio, (dw, dh)
 
-def focus_process(x):
-    # x(b,c,w,h) -> y(b,4c,w/2,h/2)
-    return np.concatenate([x[..., ::2, ::2], x[..., 1::2, ::2], x[..., ::2, 1::2], x[..., 1::2, 1::2]], 1)
-    
 
 def get_model_output_by_index(model_output, i):
     temp_output_buf = acl.mdl.get_dataset_buffer(model_output, i)
@@ -92,49 +61,6 @@ def get_model_output_by_index(model_output, i):
     # https://support.huawei.com/enterprise/en/doc/EDOC1100206687/495fa7b/function-ptr_to_numpy
     return output_host, acl.util.ptr_to_numpy(output_host, (infer_output_size//2,), 23)
 
-def _make_grid(nx=20, ny=20):
-    xv, yv = np.meshgrid(np.arange(nx), np.arange(ny))
-    return np.stack((xv, yv), 2).reshape((1, 1, ny, nx, 2)).astype(np.float)
-
-
-def sigmoid(x0):
-    s = 1 / (1 + np.exp(-x0))
-    return s
-
-def detect(x, c, model_type="yolov5"):
-    """
-    x(bs,3,20,20,85)
-    """
-    # x(bs,3,20,20,85)
-    z = []
-    grid = []
-    for i in range(len(x)):
-        _, _, ny, nx, _ =  x[i].shape
-        grid.append(_make_grid(nx, ny))
-
-    if model_type == 'yolov5':
-        stride =  np.array([8, 16, 32])
-        anchor_grid = np.array(
-            [[10., 13, 16, 30, 33, 23], [30, 61, 62, 45, 59, 119], [116, 90, 156, 198, 373, 326]])\
-            .reshape(3, 1, 3, 1, 1, 2)
-    elif model_type == 'yolov3':
-        stride = np.array([32, 16, 8])
-        anchor_grid = np.array(
-            [[116, 90, 156, 198, 373, 326], [30, 61, 62, 45, 59, 119], [10., 13, 16, 30, 33, 23]])\
-            .reshape(3, 1, 3, 1, 1, 2)
-
-    t = time.time()
-    for i in range(3):
-        y = sigmoid(x[i].astype(np.float32))
-        # y = x[i]
-        y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + grid[i]) * stride[i]  # xy
-        y[..., 2:4] = (y[..., 2:4] * 2) ** 2 * anchor_grid[i]  # wh
-        z.append(y.reshape(1, -1, c))
-
-    # print("For loop takes", time.time()-t)
-    return np.concatenate(z, 1)
-
-
 def xywh2xyxy(x):
     # Convert nx4 boxes from [x, y, w, h] to [x1, y1, x2, y2] where xy1=top-left, xy2=bottom-right
     #y = torch.zeros_like(x) if isinstance(x, torch.Tensor) else np.zeros_like(x)
@@ -143,34 +69,33 @@ def xywh2xyxy(x):
     y[:, 1] = x[:, 1] - x[:, 3] / 2  # top left y
     y[:, 2] = x[:, 0] + x[:, 2] / 2  # bottom right x
     y[:, 3] = x[:, 1] + x[:, 3] / 2  # bottom right y
-    
-    return y
 
+    return y
 
 def nms(boxes, scores, iou_thres):
     # if there are no boxes, return an empty list
     if len(boxes) == 0:
         return np.zeros(1)
-    
+
     # if the bounding boxes integers, convert them to floats --
     # this is important since we'll be doing a bunch of divisions
     if boxes.dtype.kind == "i":
         boxes = boxes.astype("float32")
-    
-    # initialize the list of picked indexes	
+
+    # initialize the list of picked indexes
     pick = []
-    
+
     # grab the coordinates of the bounding boxes
     x1 = boxes[:,0]
     y1 = boxes[:,1]
     x2 = boxes[:,2]
     y2 = boxes[:,3]
-    
+
     # compute the area of the bounding boxes and sort the bounding
     # boxes by the bottom-right y-coordinate of the bounding box
     area = (x2 - x1 + 1) * (y2 - y1 + 1)
     idxs = np.argsort(scores)
-    
+
     # keep looping while some indexes still remain in the indexes
     # list
     while len(idxs) > 0:
@@ -179,7 +104,7 @@ def nms(boxes, scores, iou_thres):
         last = len(idxs) - 1
         i = idxs[last]
         pick.append(i)
-        
+
         # find the largest (x, y) coordinates for the start of
         # the bounding box and the smallest (x, y) coordinates
         # for the end of the bounding box
@@ -187,18 +112,18 @@ def nms(boxes, scores, iou_thres):
         yy1 = np.maximum(y1[i], y1[idxs[:last]])
         xx2 = np.minimum(x2[i], x2[idxs[:last]])
         yy2 = np.minimum(y2[i], y2[idxs[:last]])
-        
+
         # compute the width and height of the bounding box
         w = np.maximum(0, xx2 - xx1 + 1)
         h = np.maximum(0, yy2 - yy1 + 1)
-        
+
         # compute the ratio of overlap
         overlap = (w * h) / area[idxs[:last]]
-        
+
         # delete all indexes from the index list that have
         idxs = np.delete(idxs, np.concatenate(([last],
             np.where(overlap > iou_thres)[0])))
-        
+
     # return only picked value
     return np.array(pick)
 
@@ -239,7 +164,7 @@ def non_max_suppression(prediction, conf_thres=0.1, iou_thres=0.6, merge=False, 
         # Detections matrix nx6 (xyxy, conf, cls)
         i, j = np.nonzero(x[:, 5:] > conf_thres)
         x = np.concatenate((box[i], x[i, j + 5, None], j[:, None].astype('float32')), 1)
-            
+
         # Filter by class
         #if classes:
         #    x = x[(x[:, 5:6] == torch.tensor(classes, device=x.device)).any(1)]
@@ -252,7 +177,7 @@ def non_max_suppression(prediction, conf_thres=0.1, iou_thres=0.6, merge=False, 
         n = x.shape[0]  # number of boxes
         if not n:
             continue
-            
+
         # Sort by confidence
         # x = x[x[:, 4].argsort(descending=True)]
 
@@ -260,10 +185,10 @@ def non_max_suppression(prediction, conf_thres=0.1, iou_thres=0.6, merge=False, 
         c = x[:, 5:6] * (0 if agnostic else max_wh)  # classes
         boxes, scores = x[:, :4] + c, x[:, 4]  # boxes (offset by class), scores
         i = nms(boxes, scores, iou_thres)
-       
+
         if i.shape[0] > max_det:  # limit detections
             i = i[:max_det]
-            
+
         output[xi] = x[i]
         if (time.time() - t) > time_limit:
             break  # time limit exceeded
@@ -273,10 +198,12 @@ def non_max_suppression(prediction, conf_thres=0.1, iou_thres=0.6, merge=False, 
 
 def clip_coords(boxes, img_shape):
     # Clip bounding xyxy bounding boxes to image shape (height, width)
-    np.clip(boxes[:, 0], 0, img_shape[1])
-    np.clip(boxes[:, 1], 0, img_shape[0])
-    np.clip(boxes[:, 2], 0, img_shape[1])
-    np.clip(boxes[:, 3], 0, img_shape[0])
+    # np.clip(boxes[:, 0], 0, img_shape[1])
+    # np.clip(boxes[:, 1], 0, img_shape[0])
+    # np.clip(boxes[:, 2], 0, img_shape[1])
+    # np.clip(boxes[:, 3], 0, img_shape[0])
+    boxes[:, [0, 2]] = boxes[:, [0, 2]].clip(0, img_shape[1])  # x1, x2
+    boxes[:, [1, 3]] = boxes[:, [1, 3]].clip(0, img_shape[0])  # y1, y2
 
 
 def scale_coords(img1_shape, coords, img0_shape, ratio_pad=None):
