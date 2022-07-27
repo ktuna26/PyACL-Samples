@@ -58,10 +58,15 @@ Yolov5 v2.0 = https://github.com/ultralytics/yolov5/releases/tag/v2.0
 Yolov5 v6.1 = https://github.com/ultralytics/yolov5/releases/tag/v6.1
 
 </br>
+
 ##### Huawei Atlas 800 3010 X86 inference server (Ascend310)
+
 <img src="./data/confidance.png" width=650>
+
 </br>
+
 <img src="./data/time.png" width=650>
+
 </br>
 
 | Model   | Latency (ms) (v2.0) |Latency (ms) (v6.1) |
@@ -72,6 +77,7 @@ Yolov5 v6.1 = https://github.com/ultralytics/yolov5/releases/tag/v6.1
 | yolov5x | 74.31        |74.05|
 
 </br>
+
 ### Jupyter Notebook Example Output
 
 <img src="./data/example.png" width=650>
