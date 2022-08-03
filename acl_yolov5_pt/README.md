@@ -57,24 +57,39 @@ Yolov5 v2.0 = https://github.com/ultralytics/yolov5/releases/tag/v2.0
 
 Yolov5 v6.1 = https://github.com/ultralytics/yolov5/releases/tag/v6.1
 
+Speed averaged over [COCO2017](https://cocodataset.org/#download) val images. Reproduced by Benchmark.ipynb.
+Note = Parameters changed for benchmark test. [conf_thres=0.25 | iou_thres=0.45] (acl_model.py)
+
+    pred = non_max_suppression(res_tensor, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic=False) 
+
+This parameters refers : https://github.com/ultralytics/yolov5/releases/tag/v6.1 Table Notes section.
 </br>
 
-##### Huawei Atlas 800 3010 X86 inference server (Ascend310)
+##### Huawei Atlas 800 3010 X86 Inference Server (Ascend310)
 
-<img src="./data/confidance.png" width=650>
+<img src="./data/atlas3010_time.png" width=650>
 
 </br>
 
-<img src="./data/time.png" width=650>
+
+| Model   | Latency (ms) (v2.0) |Latency (ms) (v6.1) |
+|---------|--------------|-------------|
+| yolov5s | 41.28        |38.77         |
+| yolov5m | 55.05        |45.93         |
+| yolov5l | 66.69        |56.45         |
+| yolov5x | 80.52        |74.48         |
+
+##### Huawei Atlas 800 9010 X86 Training Server (Ascend910)
+<img src="./data/atlas9010_time.png" width=650>
 
 </br>
 
 | Model   | Latency (ms) (v2.0) |Latency (ms) (v6.1) |
 |---------|--------------|-------------|
-| yolov5s | 38.88        |38.40|
-| yolov5m | 48.80        |47.68|
-| yolov5l | 61.00        |57.44|
-| yolov5x | 74.31        |74.05|
+| yolov5s | 31.75        |29.40         |
+| yolov5m | 38.57        |30.63         |
+| yolov5l | 39.45        |31.88         |
+| yolov5x | 42.76        |34.00         |
 
 </br>
 
