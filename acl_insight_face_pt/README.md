@@ -50,7 +50,7 @@ chmod +x tools/onnx_converter_env_setup.sh
 # Modify paths for you.
 python3 onnx_export.py --config scrfd_34g.py \
                        --weights scrfd_34g.pth \
-                       --input_img ../data/sample.jpg 
+                       --input_img ../data/sample.jpg \
                        --simplify
 ```
 
