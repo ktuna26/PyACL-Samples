@@ -41,8 +41,8 @@ cp acl_insight_face_pt/model/*  {path}/insightface/detection/scrfd/tools/
 - Change directory to `scrfd/`, then run the `model/onnx_converter_env_setup.sh`
 ```bash
 cd {path}/insightface/detection/scrfd/
-chmod +x model/onnx_converter_env_setup.sh
-./model/onnx_converter_env_setup.sh
+chmod +x tools/onnx_converter_env_setup.sh
+./tools/onnx_converter_env_setup.sh
 ```
 - Run below python command to export `.onnx` model
 
