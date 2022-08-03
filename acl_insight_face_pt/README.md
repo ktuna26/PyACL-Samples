@@ -26,6 +26,35 @@ And then download the `PT` file of from the link.
 #### PT -> ONNX
 Use inside the original repository tools folder  the `model/onnx_export.py` the script to convert `PT` file to `ONNX ` file.
 
+- Download the original repository for convert pt model to onnx.
+
+```bash
+git clone https://github.com/deepinsight/insightface.git
+```
+
+- Copy files inside of the model directory to `insightface/detection/scrfd/tools` folder in the original repository.
+
+```bash
+cp acl_insight_face_pt/model/*  {path}/insightface/detection/scrfd/tools/ 
+```
+
+- Change directory to `scrfd/`, then run the `model/onnx_converter_env_setup.sh`
+```bash
+cd {path}/insightface/detection/scrfd/
+chmod +x model/onnx_converter_env_setup.sh
+./model/onnx_converter_env_setup.sh
+```
+- Run below python command to export `.onnx` model
+
+```bash 
+# Modify paths for you.
+python3 onnx_export.py --config scrfd_34g.py \
+                       --weights scrfd_34g.pth \
+                       --input_img ../data/sample.jpg 
+                       --simplify
+```
+
+
 #### ONNX -> OM
 And then use in the same directory atc tool to convert `ONNX ` file to `OM` file as as follows.
 ```bash
