@@ -79,19 +79,6 @@ This parameters refers : https://github.com/ultralytics/yolov5/releases/tag/v6.1
 | yolov5l | 66.69        |56.45         |
 | yolov5x | 80.52        |74.48         |
 
-##### Huawei Atlas 800 9010 X86 Training Server (Ascend910)
-<img src="./data/atlas9010_time.png" width=650>
-
-</br>
-
-| Model   | Latency (ms) (v2.0) |Latency (ms) (v6.1) |
-|---------|--------------|-------------|
-| yolov5s | 31.75        |29.40         |
-| yolov5m | 38.57        |30.63         |
-| yolov5l | 39.45        |31.88         |
-| yolov5x | 42.76        |34.00         |
-
-</br>
 
 ### Jupyter Notebook Example Output
 
