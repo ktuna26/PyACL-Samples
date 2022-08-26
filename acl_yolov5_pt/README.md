@@ -1,64 +1,105 @@
 # PyTorch YoloV5 Object Detection
-Please open the jupyter notebook for a quick demo. This sample uses  **yolov5s**.  
-Addtionally, the code supported PT yolov3 (https://www.hiascend.com/zh/software/modelzoo/detail/1/36ea401e0d844f549da2693c6289ad89)
-
-## Original Network Link
-
-https://github.com/ultralytics/yolov5
-
-## Pre-trained Model Link:
-
-Download the PT file of from this link,
-- https://github.com/ultralytics/yolov5/releases/tag/v2.0
-- Upload the pt file to `model` directory
+Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https://github.com/ultralytics/yolov5/releases/tag/v6.1) | [Original Github Repository (v6.1)](https://github.com/ultralytics/yolov5/tree/v6.1)
 
 ## PT model -> ONNX format -> Ascend om format
 ### PT -> ONNX
-Use the onnx_exporter/export.py script in this repository to convert PT file to ONNX file.  
-Use this step to convert  **yolov3.pt**  to  **yolov3_sim.onnx**. 
+Use this step to convert  **`yolov5s.pt`**  to  **`yolov5s.onnx`**. 
 
-```
-python onnx_exporter/export.py --weights model/yolov3.pt --img-size 416 --batch-size 1 --simplify
+We recomend to use python virtual environment for **PT->ONNX** conversion.
+
+- Example for python virtual environment: 
+```bash
+python -m venv ENV_NAME
+
+source ENV_NAME/bin/activate
 ```
 
-### Remove a few operators in the ONNX file
-The  **Slice** and  **Transpose** operators will slow down the model inference significantly. Use ./model/modify_yolov5.py script in this repo to remove the impact of these operators.  
-This step is **NOT** needed for yolov3.
+- Example for conda virtual environment:
+
+```bash
+conda create -n ENV_NAME
+
+conda activate ENV_NAME
+```
+- Change directiory to export folder.
+- Install necessary python packages using requirements.txt file:
+  
+```bash
+pip install -r requirements.txt
+```
+Use the `onnx_converter.py` script to convert `PT` file to `ONNX ` file.
+
+```bash
+python onnx_converter.py --weights yolov5s.pt
+```
+
+If you got conversion error while converting to ONNX, you should check your `torch` and `torchvision` versions.(`torch==1.10.2` and `torchvision==0.11.3`)
 
 ### ONNX -> OM
+
 ```bash
 cd ./model
-atc --model=yolov5s_sim_t.onnx \
+atc --model=yolov5s.onnx \
     --framework=5 \
-    --output=yolov5s_sim_aipp \
+    --output=yolov5s_v6 \
     --input_format=NCHW \
-    --log=error \
-    --soc_version=Ascend310 \
+    --soc_version=Ascend310 \ # Change soc_version variable (Ascend310/Ascend910) for different chip architectures
     --input_shape="images:1,3,640,640" \
     --enable_small_channel=1 \
     --output_type=FP16 \
     --insert_op_conf=aipp.cfg
 ```
 
-```bash
-atc --model=yolov3_sim.onnx \
-    --framework=5 \
-    --output=yolov3_bs1_aipp \
-    --input_format=NCHW \
-    --soc_version=Ascend310 \
-    --input_shape="images:1,3,416,416" \
-    --insert_op_conf=aipp_yolov3.cfg \
-    --output_type=FP16
-```
-
 ## Benchmark
-The benchmark is conducted on a Huawei Atlas 800 3010 X86 inference server (Ascend310) with CANN 21.0.2 and models from https://github.com/ultralytics/yolov5/releases/tag/v2.0 .
+The benchmark is conducted on a Huawei Atlas 800 3010 X86 inference server (Ascend310) and Huawei Atlas 800 9010 x86 training server (Ascend910) with CANN 21.0.4 and models from:
+ 
+Yolov5 v2.0 = https://github.com/ultralytics/yolov5/releases/tag/v2.0 
 
-The latency only covers the model inference (graph run),  **EXCLUDING**  YOLO post-processing
+Yolov5 v6.1 = https://github.com/ultralytics/yolov5/releases/tag/v6.1
 
-| Model   | Latency (ms) |
-|---------|--------------|
-| yolov5s | 8.26         |
-| yolov5m | 13.47        |
-| yolov5l | 22.86        |
-| yolov5x | 35.96        |
+Speed averaged over [COCO2017](https://cocodataset.org/#download) val images. Reproduced by Benchmark.ipynb.
+Note = Parameters changed for benchmark test. [conf_thres=0.25 | iou_thres=0.45] (acl_model.py)
+
+    pred = non_max_suppression(res_tensor, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic=False) 
+
+This parameters refers : https://github.com/ultralytics/yolov5/releases/tag/v6.1 Table Notes section.
+</br>
+
+##### Huawei Atlas 800 3010 X86 Inference Server (Ascend310)
+
+<img src="./data/atlas3010_time.png" width=650>
+
+</br>
+
+
+| Model   | Latency (ms) (v2.0) |Latency (ms) (v6.1) |
+|---------|--------------|-------------|
+| yolov5s | 41.28        |38.77         |
+| yolov5m | 55.05        |45.93         |
+| yolov5l | 66.69        |56.45         |
+| yolov5x | 80.52        |74.48         |
+
+##### Huawei Atlas 800 9010 X86 Training Server (Ascend910)
+<img src="./data/atlas9010_time.png" width=650>
+
+</br>
+
+| Model   | Latency (ms) (v2.0) |Latency (ms) (v6.1) |
+|---------|--------------|-------------|
+| yolov5s | 31.75        |29.40         |
+| yolov5m | 38.57        |30.63         |
+| yolov5l | 39.45        |31.88         |
+| yolov5x | 42.76        |34.00         |
+
+</br>
+
+### Jupyter Notebook Example Output
+
+<img src="./data/example.png" width=650>
+
+</br></br></br></br></br></br></br></br></br>
+
+
+<p align="center">
+<img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" align="center"/>
+</p>

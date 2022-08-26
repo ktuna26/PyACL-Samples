@@ -1,4 +1,0 @@
-# pip install -U -r requirements.txt
-torch==1.5.0
-onnx
-onnx-simplifier

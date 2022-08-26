@@ -15,8 +15,8 @@ from constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
                                     ACL_MEMCPY_HOST_TO_DEVICE, \
                                     ACL_MEMCPY_DEVICE_TO_HOST, \
                                     ACL_ERROR_NONE, NPY_BYTE
-from postprocessing import get_model_output_by_index, letterbox, focus_process, \
-                                               resize_image, detect, non_max_suppression, scale_coords
+from postprocessing import get_model_output_by_index, letterbox, \
+                                                 non_max_suppression, scale_coords
 
 class Model(object):
     def __init__(self,
@@ -107,8 +107,7 @@ class Model(object):
             print("output ", i)
             print("model output dims", acl.mdl.get_output_dims(self.model_desc, i))
             print("model output datatype", acl.mdl.get_output_data_type(self.model_desc, i))
-            self.yolo_shapes.append(acl.mdl.get_output_dims(self.model_desc, i)[0]['dims'])
-            self.element_number = acl.mdl.get_output_dims(self.model_desc, i)[0]['dims'][-1]
+            self.model_output_height, self.model_output_width = acl.mdl.get_output_dims(self.model_desc, i)[0]['dims'][1:]
         print("=" * 50)
         print("[Model] class Model init resource stage success")
    
@@ -126,39 +125,29 @@ class Model(object):
         return img_dev_ptr, img_buf_size
     
     def run1(self, img):
-        # print("self.model_input_width, self.model_input_height", self.model_input_width, self.model_input_height)
+        k = time.time()
         self.img = letterbox(img, (self.model_input_width, self.model_input_height))[0]
         self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
         image_np = self.img
         
         img_dev_ptr, img_buf_size = self.transfer_img_to_device(image_np)
-#         print("img_dev_ptr, img_buf_size: ", img_dev_ptr, img_buf_size)
         self._gen_input_dataset(img_dev_ptr, img_buf_size)
-        t = time.time()
+        #t = time.time()
         self.forward()
-        print("inference takes", time.time()-t)
+        #print("inference takes", time.time()-t)
 
-        t = time.time()
-        host_buf_1, pred_sbbox = get_model_output_by_index(self.output_data, 0)
-        host_buf_2, pred_mbbox = get_model_output_by_index(self.output_data, 1)
-        host_buf_3, pred_lbbox = get_model_output_by_index(self.output_data, 2)
-        feature_maps = [pred_sbbox, pred_mbbox, pred_lbbox]
+        #t = time.time()
 
-        print("moving data takes", time.time()-t)
-        # t = time.time()
-        # print("self.yolo_shapes", self.yolo_shapes)
-        for idx, feat, tgt_shape in zip(range(3), feature_maps, self.yolo_shapes):
-            feature_maps[idx] = feat.reshape(tgt_shape)
-        t = time.time()
-        # print("feature_maps shape", feature_maps[0].shape)
-        # print("self.element_number", self.element_number)
-        res_tensor = detect(feature_maps, self.element_number, model_type=self.model_type)
-        print("detect takes", time.time()-t)
-        t = time.time()
+        host_buf, feature_maps = get_model_output_by_index(self.output_data, 0)
+        feature_maps =feature_maps.reshape(-1,self.model_output_height, self.model_output_width)
+        
         # Apply NMS
-        pred = non_max_suppression(res_tensor, conf_thres=0.4, iou_thres=0.5, classes=None, agnostic=False)
-        print("nms takes", time.time()-t)
-        t = time.time()
+        # print(feature_maps)
+        # print("Shape:",feature_maps.shape)
+        pred = non_max_suppression(feature_maps, conf_thres=0.45, iou_thres=0.5, classes=None, agnostic=False)
+        
+        #print("nms takes", time.time()-t)
+        #t = time.time()
         # Process detections
         bboxes = []
         src_img = img
@@ -171,20 +160,18 @@ class Model(object):
                     bboxes.append([*xyxy, conf, int(cls)])
             else:
                 pass
-        print("the rest takes", time.time()-t)
-        t = time.time()
-        # self._release_dataset()
-        for host_buf in [host_buf_1, host_buf_2, host_buf_3]:
-            ret = acl.rt.free_host(host_buf)
-            check_ret("acl.rt.free_host", ret)
-        for feat_map in feature_maps:
-            del feat_map
+        #print("the rest takes", time.time()-t)
+        #t = time.time()
+        
+        ret = acl.rt.free_host(host_buf)
+        check_ret("acl.rt.free_host", ret)
+        del feature_maps
 
-        print("resource release takes", time.time()-t)
-        return bboxes
+        return bboxes, time.time()-k
 
     def forward(self):
         print('[Model] execute stage:')
+        print(self.model_id, self.input_dataset,self.output_data)
         ret = acl.mdl.execute(self.model_id,
                               self.input_dataset,
                               self.output_data)
