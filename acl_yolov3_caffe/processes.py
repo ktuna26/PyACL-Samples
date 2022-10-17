@@ -84,6 +84,7 @@ def get_sizes(model_desc):
 
 def preprocessing(img,model_desc):
     #model_input_height, model_input_width ,_ ,_ = get_sizes(model_desc)
+    img = cv2.resize(img, (416, 416), interpolation = cv2.INTER_AREA)
     image_height, image_width = img.shape[:2]
     img_resized = letterbox_resize(img, 416, 416)[:, :, ::-1]
     # img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1]
@@ -117,6 +118,7 @@ def letterbox_resize(img, new_width, new_height, interp=0):
 def post_process(infer_output, bgr_img, image_file):
     """postprocess"""
     print("post process")
+    #bgr_img = cv2.resize(bgr_img, (416, 416), interpolation = cv2.INTER_AREA)
     box_num = infer_output[1][0, 0] # Kac adet bounding box olacagini return eder
     box_info = infer_output[0].flatten() # ic ice listeyi temizler
     
