@@ -32,21 +32,8 @@ class PostProcess():
         self.batched = batched
         self.use_kps = use_kps
         self.center_cache = {}
-        
-        
-    def __get_model_output_by_index(self, output_data, i):
-        temp_output_buf = acl.mdl.get_dataset_buffer(output_data, i)
-
-        infer_output_ptr = acl.get_data_buffer_addr(temp_output_buf)
-        infer_output_size = acl.get_data_buffer_size(temp_output_buf)
-
-        output_host, _ = acl.rt.malloc_host(infer_output_size)
-        acl.rt.memcpy(output_host, infer_output_size, infer_output_ptr,
-                              infer_output_size, ACL_MEMCPY_DEVICE_TO_HOST)
-        
-        return acl.util.ptr_to_numpy(output_host, (infer_output_size//4,), 11).reshape(-1,  self.model_output_dims[i][1], 
-                                                                                                                                            self.model_output_dims[i][2])
     
+        
     
     def detect(self, output_data, det_scale, input_height, input_width, thresh, max_num=0, metric='default'):
         scores_list = []
@@ -54,20 +41,28 @@ class PostProcess():
         kpss_list = []
         
         for idx, stride in enumerate(self.feat_stride_fpn):
+                print(idx)
+                print(stride)
+                print(len(self.feat_stride_fpn))
                 # 0, 2, 4 -> bboxes
                 # 1, 3, 5 -> scores
                 # If model support batch dim, take first output
                 if self.batched:
-                    scores = self.__get_model_output_by_index(output_data, ((idx * self.fmb )+ self.fms))[0]
-                    bbox_preds = self.__get_model_output_by_index(output_data, idx * self.fmb)[0]
+                    print("self.fmb",self.fmb)
+                    print("self.fms",self.fms)
+                    scores = output_data[idx][0]
+                    bbox_preds = output_data[idx+3][0]
                     bbox_preds = bbox_preds * stride
+                
+
                     if self.use_kps: # to do (it might be some bugs)
                         kps_preds = self.__get_model_output_by_index(output_data, idx + self.fmc * 2)[0] * stride
                 # If model doesn't support batching take output as is
                 else:
-                    scores = self.__get_model_output_by_index(output_data, ((idx * self.fmb)  + self.fms))
-                    bbox_preds = self.__get_model_output_by_index(output_data, idx * self.fmb)
-                    bbox_preds = bbox_preds * stride
+                    scores = output_data[idx]
+                    bbox_preds = output_data[idx+3]
+                    bbox_preds = bbox_preds * stride                    
+
                     if self.use_kps: # to do (it might be some bugs)
                         kps_preds = self.__get_model_output_by_index(output_data, idx + self.fmc * 2) * stride
                 

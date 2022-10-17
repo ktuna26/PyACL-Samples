@@ -1,19 +1,71 @@
-"""
-Copyright 2021 Huawei Technologies Co., Ltd
+# sys.path.append('../acllite')
+# from acllite_resource import AclLiteResource
+# from acllite_model import AclLiteModel
 
-CREATED:  2020-6-04 20:12:13
-MODIFIED: 2021-11-02 23:48:45
-"""
-
-# -*- coding:utf-8 -*-
-import acl
+# acl_resource = AclLiteResource()
 import cv2
-import time
 import numpy as np
+import acl
+import time
 
-from constant import ACL_MEM_MALLOC_NORMAL_ONLY, \
-    ACL_MEMCPY_HOST_TO_DEVICE, ACL_MEMCPY_DEVICE_TO_HOST, \
-    ACL_ERROR_NONE, NPY_BYTE
+def get_sizes(model_desc):
+    input_size = acl.mdl.get_num_inputs(model_desc)
+    output_size = acl.mdl.get_num_outputs(model_desc)
+    print("model input size", input_size)
+    for i in range(input_size):
+        print("input ", i)
+        print("model input dims", acl.mdl.get_input_dims(model_desc, i))
+        print("model input datatype", acl.mdl.get_input_data_type(model_desc, i))
+        model_input_height, model_input_width = (i for i in acl.mdl.get_input_dims(model_desc, i)[0]['dims'][1:3])
+    print("=" * 50)
+    print("model output size", output_size)
+    for i in range(output_size):
+        print("output ", i)
+        print("model output dims", acl.mdl.get_output_dims(model_desc, i))
+        print("model output datatype", acl.mdl.get_output_data_type(model_desc, i))
+        model_output_height, model_output_width = acl.mdl.get_output_dims(model_desc, i)[0]['dims'][1:]
+    print("=" * 50)
+    print("[Model] class Model init resource stage success")
+    return model_input_height,model_input_width,model_output_height,model_output_width
+
+
+
+def preprocessing(img,model_desc):
+    model_input_height, model_input_width ,_ ,_ = get_sizes(model_desc)
+    img = letterbox(img, (model_input_width, model_input_height))[0]
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    image_np = img
+    return image_np
+
+def postprocessing(feature_maps,src_img,model_desc):
+    model_input_height,model_input_width,model_output_height,model_output_width = get_sizes(model_desc)
+
+    feature_maps_ =feature_maps.reshape(-1,model_output_height, model_output_width)
+    # feature_maps_ = feature_maps
+    pred = non_max_suppression(feature_maps_, conf_thres=0.45, iou_thres=0.5, classes=None, agnostic=False)
+    
+    #print("nms takes", time.time()-t)
+    #t = time.time()
+    # Process detections
+    bboxes = []
+    src_img = src_img
+    
+    for i, det in enumerate(pred):  # detections per image
+        # Rescale boxes from img_size to im0 size
+        if det is not None:
+            det[:, :4] = scale_coords((model_input_width, model_input_height), det[:, :4], src_img.shape).round()
+            for *xyxy, conf, cls in det:
+                bboxes.append([*xyxy, conf, int(cls)])
+        else:
+            pass
+    #print("the rest takes", time.time()-t)
+    #t = time.time()
+    
+    del feature_maps_
+
+    return bboxes
+
+    
 
 def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True):
     # Resize image to a 32-pixel-multiple rectangle https://github.com/ultralytics/yolov3/issues/232
@@ -47,19 +99,6 @@ def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scale
     img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
     return img, ratio, (dw, dh)
 
-
-def get_model_output_by_index(model_output, i):
-    temp_output_buf = acl.mdl.get_dataset_buffer(model_output, i)
-
-    infer_output_ptr = acl.get_data_buffer_addr(temp_output_buf)
-    infer_output_size = acl.get_data_buffer_size(temp_output_buf)
-
-    output_host, _ = acl.rt.malloc_host(infer_output_size)
-    acl.rt.memcpy(output_host, infer_output_size, infer_output_ptr,
-                          infer_output_size, ACL_MEMCPY_DEVICE_TO_HOST)
-
-    # https://support.huawei.com/enterprise/en/doc/EDOC1100206687/495fa7b/function-ptr_to_numpy
-    return output_host, acl.util.ptr_to_numpy(output_host, (infer_output_size//2,), 23)
 
 def xywh2xyxy(x):
     # Convert nx4 boxes from [x, y, w, h] to [x1, y1, x2, y2] where xy1=top-left, xy2=bottom-right
