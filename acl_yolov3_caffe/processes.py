@@ -82,11 +82,20 @@ def get_sizes(model_desc):
     print("[Model] class Model init resource stage success")
     return model_input_height,model_input_width,model_output_height,model_output_width
 
-def preprocessing(img,model_desc):
+def preprocessing(img,model_desc,model_name ="yolov3"):
+    if model_name == "yolov3":
+        model_width = 416
+        model_height = 416
+    elif model_name == "yolov4":
+        model_width = 608
+        model_height = 608
+    else:
+        raise TypeError('model name parameter is wrong!')
+
     #model_input_height, model_input_width ,_ ,_ = get_sizes(model_desc)
-    img = cv2.resize(img, (416, 416), interpolation = cv2.INTER_AREA)
+    img = cv2.resize(img, (model_width, model_height), interpolation = cv2.INTER_AREA)
     image_height, image_width = img.shape[:2]
-    img_resized = letterbox_resize(img, 416, 416)[:, :, ::-1]
+    img_resized = letterbox_resize(img, model_width, model_height)[:, :, ::-1]
     # img_resized = self.resize_image(img, (self.model_input_width, self.model_input_height))[:, :, ::-1]
     # img_resized = (img_resized / 255).astype(np.float32).transpose([2, 0, 1])
     img_resized = np.ascontiguousarray(img_resized)
@@ -102,8 +111,6 @@ def letterbox_resize(img, new_width, new_height, interp=0):
     resize_w = int(resize_ratio * ori_width)
     resize_h = int(resize_ratio * ori_height)
 
-    # img = cv2.resize(img, (resize_w, resize_h), interpolation=interp)
-    # img = cv2.resize(img, (resize_w, resize_h), interpolation=cv2.INTER_LINEAR)
     img = cv2.resize(img, (resize_w, resize_h), interpolation=cv2.INTER_NEAREST)
 
     image_padded = np.full((new_height, new_width, 3), 128, np.uint8)
@@ -112,17 +119,14 @@ def letterbox_resize(img, new_width, new_height, interp=0):
     dh = int((new_height - resize_h) / 2)
 
     image_padded[dh: resize_h + dh, dw: resize_w + dw, :] = img
-    # return image_padded, resize_ratio, dw, dh
     return image_padded
 
-def post_process(infer_output, bgr_img, image_file):
+def post_process(infer_output, bgr_img, image_file,model_name="yolov3"):
     """postprocess"""
     print("post process")
-    #bgr_img = cv2.resize(bgr_img, (416, 416), interpolation = cv2.INTER_AREA)
-    box_num = infer_output[1][0, 0] # Kac adet bounding box olacagini return eder
-    box_info = infer_output[0].flatten() # ic ice listeyi temizler
+    box_num = infer_output[1][0, 0]
+    box_info = infer_output[0].flatten() 
     
-    # Modelin en ve boy ile orantisi
     print(f'image shape = {bgr_img.shape}')
     scalex = bgr_img.shape[1] / MODEL_WIDTH
     print(f'scalex : {scalex}')
@@ -142,23 +146,13 @@ def post_process(infer_output, bgr_img, image_file):
     
     print(f'box_num: {box_num}')
     for n in range(int(box_num)):
-        ids = int(box_info[5 * int(box_num) + n]) # Class ID'si box_num'dan cekilir
-        label = labels[ids] # Class Labeli
-        score = box_info[4 * int(box_num)+n] # Confidence (?)
-        #print(f'\n\n=========\n Box Info = {box_info} \n=========\n\n')
-        ##############################################################################
+        ids = int(box_info[5 * int(box_num) + n]) 
+        label = labels[ids] 
+        score = box_info[4 * int(box_num)+n]
         top_left_x = box_info[0 * int(box_num) + n] * scalex
-        #print(f'top_left_x = box_info[{0 * int(box_num) + n}] * {scalex} = {top_left_x}')
-        
         top_left_y = box_info[1 * int(box_num) + n] * scaley
-        #print(f'top_left_y = box_info[{1 * int(box_num) + n}] * {scaley} = {top_left_y}')
-        
         bottom_right_x = box_info[2 * int(box_num) + n] * scalex
-        #print(f'bottom_left_x = box_info[{2 * int(box_num) + n}] * {scalex} = {bottom_right_x}')
-        
         bottom_right_y = box_info[3 * int(box_num) + n] * scaley
-        #print(f'bottom_left_y = box_info[{3 * int(box_num) + n}] * {scaley} = {bottom_right_y}')
-        ##############################################################################
         print(" % s: class % d, box % d % d % d % d, score % f" % (
             label, ids, top_left_x, top_left_y, 
             bottom_right_x, bottom_right_y, score))
@@ -171,5 +165,4 @@ def post_process(infer_output, bgr_img, image_file):
     print("output:%s" % output_file)
     cv2.imwrite(output_file, bgr_img)
     print("success!")
-    #plt.figure(figsize=(20,10))
     return bgr_img
