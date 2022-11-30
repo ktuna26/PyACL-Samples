@@ -10,7 +10,6 @@ Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https:/
 
     [Pretrained .air Model](https://onebox.huawei.com/p/dad426ea028637e90fdef4f7a272e8cf)
 
-    ```
 2. Model conversion from .air to .om with ATC:
     ```bash
     # Model conversion ascend310
