@@ -25,4 +25,9 @@ net.load_weights("blazefaceback.pth")
 img = torch.zeros((1, 3, 256, 256)) # BCHW
 
 # trace export
+<<<<<<< HEAD
 torch.onnx.export(net, img, 'blazefaceback.onnx', export_params=True, verbose=True, opset_version=11)
+=======
+torch.onnx.export(net, img, 'blazefaceback.onnx', export_params=True, verbose=True, opset_version=11)
+# torch.onnx.export(net, img, 'blazefaceback.onnx', export_params=True, verbose=True)
+>>>>>>> dev2

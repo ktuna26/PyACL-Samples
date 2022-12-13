@@ -15,10 +15,17 @@ source ENV_NAME/bin/activate
 ```
 
 - Example for conda virtual environment:
+<<<<<<< HEAD
 
 ```bash
 conda create -n ENV_NAME
 
+=======
+
+```bash
+conda create -n ENV_NAME
+
+>>>>>>> dev2
 conda activate ENV_NAME
 ```
 - Change directiory to export folder.
@@ -50,6 +57,7 @@ atc --model=yolov5s.onnx \
     --insert_op_conf=aipp.cfg
 ```
 
+<<<<<<< HEAD
 ## Benchmark
 The benchmark is conducted on a Huawei Atlas 800 3010 X86 inference server (Ascend310) and Huawei Atlas 800 9010 x86 training server (Ascend910) with CANN 21.0.4 and models from:
  
@@ -80,6 +88,8 @@ This parameters refers : https://github.com/ultralytics/yolov5/releases/tag/v6.1
 | yolov5x | 80.52        |74.48         |
 
 
+=======
+>>>>>>> dev2
 ### Jupyter Notebook Example Output
 
 <img src="./data/example.png" width=650>

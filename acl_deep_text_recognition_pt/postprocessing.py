@@ -7,7 +7,8 @@ MODIFIED: 2021-11-19 00:48:45
 
 # -*- coding:utf-8 -*-
 import numpy as np
-from constant import BLANK
+#from constant import BLANK
+BLANK = 0
 
 
 class Process:
@@ -18,6 +19,8 @@ class Process:
         
     
     def text_boxes(self, preds, j):
+        char_list = ' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        self.charters = char_list
         pred_index = np.argmax(preds, axis=2)[0, :]    # output
 
         characters = []
@@ -25,6 +28,8 @@ class Process:
             if pred_index[i] != BLANK and (not (i > 0 and pred_index[i - 1] == pred_index[i])):
                 characters.append(self.charters[pred_index[i]])
             self.bboxes[j].text = ''.join(characters)
+        #     text = ''.join(characters)
+        # print(text)
            
 
     def get_concat_same(self):

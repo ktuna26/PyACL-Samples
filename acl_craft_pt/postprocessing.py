@@ -10,6 +10,9 @@ import cv2
 import math
 import numpy as np
 
+from imgproc import loadImage, resize_aspect_ratio, normalizeMeanVariance, \
+    cvt2HeatmapImg
+
 
 """ auxilary functions """
 # unwarp corodinates
@@ -246,3 +249,20 @@ def adjustResultCoordinates(polys, ratio_w, ratio_h, ratio_net = 2):
             if polys[k] is not None:
                 polys[k] *= (ratio_w * ratio_net, ratio_h * ratio_net)
     return polys
+
+def postprocess(threshold_dict, score_link, score_text, poly, ratio_h, ratio_w):
+    
+    boxes, polys = getDetBoxes(score_text, score_link, threshold_dict['text_threshold'], 
+                                   threshold_dict['link_threshold'], threshold_dict['low_text'], poly)
+
+    # coordinate adjustment
+    boxes = adjustResultCoordinates(boxes, ratio_w, ratio_h)
+    polys = adjustResultCoordinates(polys, ratio_w, ratio_h)
+    for k in range(len(polys)):
+        if polys[k] is None: polys[k] = boxes[k]
+
+    # render results (optional)
+    render_img = score_text.copy()
+    render_img = np.hstack((render_img, score_link))
+    ret_score_text = cvt2HeatmapImg(render_img)
+    return ret_score_text,boxes, polys

@@ -42,6 +42,10 @@ def sigmoid(x0):
     return s
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev2
 def decode_boxes(raw_boxes, anchors, input_size):
     """
     Converts the predictions into actual coordinates using
@@ -70,7 +74,11 @@ def decode_boxes(raw_boxes, anchors, input_size):
     return boxes
 
 
+<<<<<<< HEAD
 def array2detections(raw_boxes, raw_scores, input_size, anchors, clipping_thresh = 100.0, score_thresh = 0.7):
+=======
+def array2detections(raw_boxes, raw_scores, input_size, anchors, clipping_thresh = 100.0, score_thresh = 0.5):
+>>>>>>> dev2
     """
     The output of the neural network is a tensor of shape (b, 896, 16)
     containing the bounding box regressor predictions, as well as a tensor 
@@ -91,6 +99,18 @@ def array2detections(raw_boxes, raw_scores, input_size, anchors, clipping_thresh
     assert len(raw_scores.shape) == 3
     assert raw_scores.shape[1] == 896 # num_anchors
     assert raw_scores.shape[2] == 1 # num_classes
+<<<<<<< HEAD
+=======
+#     ## New Start
+#     assert len(raw_boxes.shape) == 3
+#     assert raw_boxes.shape[1] == 512 # num_anchors
+#     assert raw_boxes.shape[2] == 16 # num_coords
+
+#     assert len(raw_scores.shape) == 3
+#     assert raw_scores.shape[1] == 512 # num_anchors
+#     assert raw_scores.shape[2] == 1 # num_classes
+#     ## New Finish
+>>>>>>> dev2
 
     assert raw_boxes.shape[0] == raw_scores.shape[0]
         
@@ -98,6 +118,10 @@ def array2detections(raw_boxes, raw_scores, input_size, anchors, clipping_thresh
         
     raw_scores = np.clip(raw_scores, -clipping_thresh, clipping_thresh)
     detection_scores = np.squeeze(sigmoid(raw_scores), axis=-1)
+<<<<<<< HEAD
+=======
+    #detection_scores = np.squeeze(raw_scores, axis=-1)
+>>>>>>> dev2
         
     # Note: we stripped off the last dimension from the scores tensor
     # because there is only has one class. Now we can simply use a mask

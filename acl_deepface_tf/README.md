@@ -1,4 +1,4 @@
-# Tensorflow Deepface (ArcFace)
+# Tensorflow Deepface 
 Please open the jupyter notebook for a quick demo.
 
 ## Original Network Link
@@ -7,7 +7,33 @@ https://github.com/serengil/deepface
 
 ## Pre-trained Model Link:
 
-Download the h5 file according to the instructions in the original repo.
+### H5 -> ONNX
+Use this step to convert h5 to onnx
+
+We recomend to use python virtual environment for H5->ONNX conversion.
+
+- Example for python virtual environment:
+```bash
+python -m venv ENV_NAME
+
+source ENV_NAME/bin/activate
+```
+
+- Change directiory to export folder.
+- Install necessary python packages using requirements.txt file:
+
+```bash
+pip install -r requirements.txt
+```
+
+Use the onnx_converter.py script to convert H5 file to ONNX file.
+
+
+```bash
+python onnx_converter.py --model [MODEL_NAME] --output [OUTPUT_NAME]
+```
+- MODEL_NAME = arcface, vggface, facenet, deepface, openface or deepid
+- OUTPUT_NAME = filename of converted onnx file.
 
 ## Convert model To Ascend om file
 
@@ -22,3 +48,8 @@ atc --model=arcface.onnx \
     --soc_version={Ascend310, Ascend910A} \
     --out_nodes="embedding:0"
 ```
+
+
+<p align="center">
+<img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" align="center"/>
+</p>
