@@ -1,13 +1,16 @@
-import acl, time, cv2
-import sys
-sys.path.append('../acllite')
-from acllite_model import AclLiteModel
-from acllite_resource import AclLiteResource
-import acl, cv2, struct, time
+"""
+Copyright 2021 Huawei Technologies Co., Ltd
+
+CREATED:  2022-11-23 13:12:13
+MODIFIED: 2022-11-23 10:48:45
+"""
+
+# -*- coding:utf-8 -*-
+import acl
 import numpy as np
-from PIL import Image, ImageDraw
-import os
+from PIL import Image
 from collections import defaultdict
+
 
 def preprocess(img_path):
     img = Image.open(img_path).convert("RGB")

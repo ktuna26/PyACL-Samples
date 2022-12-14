@@ -1,4 +1,5 @@
 # PyTorch YOLOv4 Object Detection
+
 Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https://drive.google.com/uc?id=1wv_LiFeCRYwtpkqREPeI13-gPELBDwuJ&export=download) | [Original Github Repository](https://github.com/Tianxiaomo/pytorch-YOLOv4)
 
 ## PTH model Downloading from Google Drive 
@@ -45,14 +46,6 @@ atc --model=yolov4.onnx \
     --soc_version=Ascend310
 ```
 
-
 ### Jupyter Notebook Example Output
 
 <img src="./data/predictions.jpg" width=650>
-
-</br></br></br></br></br></br></br></br></br>
-
-
-<p align="center">
-<img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" align="center"/>
-</p>

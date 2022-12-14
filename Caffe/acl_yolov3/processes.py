@@ -1,13 +1,14 @@
-import acl, time, cv2
-import sys
-sys.path.append('../acllite')
-from acllite_model import AclLiteModel
-from acllite_resource import AclLiteResource
-import acl, cv2, struct, time
+"""
+Copyright 2021 Huawei Technologies Co., Ltd
+​
+CREATED:  2022-10-04 13:12:13
+MODIFIED: 2022-11-1 15:48:45
+"""
+​
+# -*- coding:utf-8 -*-
 import numpy as np
-from PIL import Image, ImageDraw
+import acl, cv2
 import os
-
 
 labels = ["person",
         "bicycle", "car", "motorbike", "aeroplane",
@@ -28,6 +29,7 @@ MODEL_WIDTH = 416
 MODEL_HEIGHT = 416
 
 colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 255, 255), (255, 0, 255), (255, 255, 0)]
+
 
 def construct_image_info():
     """construct image info"""

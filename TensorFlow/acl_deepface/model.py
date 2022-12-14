@@ -1,3 +1,11 @@
+"""
+Copyright 2021 Huawei Technologies Co., Ltd
+
+CREATED:  2022-11-23 13:12:13
+MODIFIED: 2022-11-23 10:48:45
+"""
+
+# -*- coding:utf-8 -*-
 import cv2
 import numpy as np
 import acl

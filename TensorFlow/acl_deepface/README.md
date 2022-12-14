@@ -48,8 +48,3 @@ atc --model=arcface.onnx \
     --soc_version={Ascend310, Ascend910A} \
     --out_nodes="embedding:0"
 ```
-
-
-<p align="center">
-<img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" align="center"/>
-</p>

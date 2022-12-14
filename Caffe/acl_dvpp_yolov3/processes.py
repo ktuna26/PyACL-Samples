@@ -1,12 +1,13 @@
-import acl, time, cv2
-import sys
-sys.path.append('../acllite')
-from acllite_model import AclLiteModel
-from acllite_resource import AclLiteResource
-import acl, cv2, struct, time
+"""
+Copyright 2022 Huawei Technologies Co., Ltd
+
+CREATED:  2022-10-04 13:12:13
+MODIFIED: 2022-12-13 10:48:45
+"""
+
+# -*- coding:utf-8 -*-
+import acl
 import numpy as np
-from PIL import Image, ImageDraw
-import os
 
 labels = ["person",
         "bicycle", "car", "motorbike", "aeroplane",
@@ -25,6 +26,7 @@ labels = ["person",
 
 MODEL_WIDTH = 416
 MODEL_HEIGHT = 416
+
 
 def get_model_info(model):
     i = 0

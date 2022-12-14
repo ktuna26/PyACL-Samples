@@ -1,5 +1,7 @@
 # MindSpore Deeplabv3
+
 Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/deeplabv3/deeplabv3_origin.air) |[Original Github Repository](https://github.com/open-mmlab/mmsegmentation)
+
 ### Sample Preparation
 
 ### AIR model -> Ascend OM format
@@ -20,7 +22,6 @@ Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https:/
     wget https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/deeplabv3/test_image/test.jpg
     cd ../src
     ```
-    
 
 ### Sample Running
 
@@ -29,15 +30,3 @@ Finaly, open jupyter-notebook and run the code for demo
 ### Jupyter Notebook Example Output
 
 <img src="./out/test.jpg" width=650>
-
-</br></br></br></br></br></br></br></br></br>
-
-<p align="center">
-<img src="https://r.huaweistatic.com/s/ascendstatic/lst/header/header-logo.png" align="center"/>
-</p>
-
-
-
-
-
-

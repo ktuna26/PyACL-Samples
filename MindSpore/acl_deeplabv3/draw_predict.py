@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-
 import argparse
-import json
-import logging
 import os
 
 import cv2
@@ -25,7 +21,6 @@ import matplotlib.colors as mplc
 import matplotlib.figure as mplf
 import matplotlib.image as mpi
 import numpy as np
-import operator
 # Part of the code reference https://github.com/facebookresearch/detectron2/tree/v0.2.1
 
 # fmt: off
