@@ -25,9 +25,11 @@ Deploy and run a sample by referring to the corresponding README file explaining
 **Note:** If you don't want to struggle to prepare development environment, you can use ready to use docker images from AscendHub. So, feel free to pull images from https://ascendhub.huawei.com/#/detail/infer-modelzoo. This image integrates ACL libs, model conversion tool (ATC), some python libraries.
 
 ## Sample Naming
-Samples like acl_dvpp_* uses Atlas DVPP (Digital Vision Pre-Processing) hardware module for image and video decoding. Briefly, the acl_dvpp_* samples load the image as encoded raw bytes (Raw video frames in video streaming) and send those bytes to the DVPP module for decoding.
+1. Samples like DVPP_* uses Atlas Digital Vision Pre-Processing (DVPP) hardware module for image and video decoding. Briefly, the DVPP_* samples load the image as encoded raw bytes (Raw video frames in video streaming) and send those bytes to the DVPP module for decoding. 
+For samples without "DVPP", the image is read with opencv as BGR numpy array. The Model then takes this BGR image and returns whatever the models were trained to return.
 
-For samples acl_* without "dvpp", the image is read with opencv as BGR numpy array. The Model then takes this BGR image and returns whatever the models were trained to return.
+2. Samples like Online_* uses 3th party libraries on ascend chips. Briefly, the Online_* samples load the 3th party models without converting and use main library.
+For samples without "Online", the model is converted with ATC (Ascend Tensor Compiler) and is runned on ACL lib.
 
 ## Python dependencies
 - Numpy
