@@ -13,7 +13,7 @@ This repository provides a wide range of samples developed based on AscendCL API
 | [Common](./Common) | Common files or libs for projets |
 | [MindSpore](./MindSpore) | PyACL sampels for MindSpore models |
 | [PyTorch](./PyTorch) | PyACL sampels for PyTorch models |
-| [Tensorflow](./Tensorflow) | PyACL sampels for Tensorflow models |
+| [TensorFlow](./TensorFlow) | PyACL sampels for Tensorflow models |
 
 #### Docker PyACL environment
 Feel free to pull images from https://ascendhub.huawei.com/#/detail/infer-modelzoo. This image integrates ACL libs, model conversion tool (ATC), some python libraries

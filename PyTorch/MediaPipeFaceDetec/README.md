@@ -1,15 +1,15 @@
 # PyTorch Mediapipe Face Detection (BlazeFace)
 Please open the `jupyter-notebook` for a quick demo!
 
-BlazeFace is a fast, light-weight face detector from Google Research | [Read More](https://sites.google.com/view/perception-cv4arvr/blazeface) | [Paper](https://arxiv.org/abs/1907.05047) | [Pretrained Model](https://github.com/google/mediapipe/raw/v0.7.12/mediapipe/models/face_detection_back.tflite)
+BlazeFace is a fast, light-weight face detector from Google Research | [Read More](https://sites.google.com/view/perception-cv4arvr/blazeface) | [Paper](https://arxiv.org/abs/1907.05047)
 
-<img alt="teaser" src="./figures/mediapipe_small.png">
+<img alt="teaser" src="./data/figures/mediapipe_small.png">
 
 ## Overview
 `PyTorch` implementation for **Mediapipe** face detector that effectively detect face area by exploring 6 keypoints (2x eyes, 2x ears, nose, mouth) for face landmarks.
 The BlazePaper paper mentions that there are two versions of the model, one for the front-facing camera and one for the back-facing camera. This repo includes only the backend camera model
 
-<img alt="teaser" src="./figures/face_detection_android_gpu.gif">
+<img alt="teaser" src="./data/figures/face_detection_android_gpu.gif">
 
 ## Getting started
 
@@ -84,7 +84,7 @@ apt-get update && apt-get install -y --no-install-recommends \
 For this stages it is recommended to use the docker environment to avoid affecting the development environment. The model_convert.sh file will do every model conversion stage automatically. After conversion you should have the .air model in your /model path.
 
 ```bash
-cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/acl_mediapipe_face_detec/model
+cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/MediapipeFaceDetec/model
 
 bash model_convert.sh
 ```

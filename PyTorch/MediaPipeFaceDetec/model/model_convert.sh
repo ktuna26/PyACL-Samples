@@ -58,5 +58,5 @@ python3 ms_export.py
 # move the air model to model folder
 mv air_blazeface_back.air ../
 # remove unnecessary files
-rm -r BlazeFace-PyTorch/ output/ blazefaceback.onnx
+sudo rm -r BlazeFace-PyTorch/ output/ blazefaceback.onnx
 echo "[MODEL] Conversion Done!"

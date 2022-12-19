@@ -1,29 +1,85 @@
 # PyTorch Deep Text Recognition
+
 Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https://onebox.huawei.com/p/c15d10921f844d83c23533394e7480e9) | [Paper](https://arxiv.org/pdf/1904.01906.pdf) | [Original Github Repository](https://github.com/clovaai/deep-text-recognition-benchmark)
 
 ## Overview
+
 `PyTorch` implementation for two-stage Scene Text Recognition (STR), that most existing STR models fit into.
 
-Using this framework, texts detected by [PyTorch-CRAFT](https://gitee.com/tianyu__zhou/pyacl_samples/tree/a800/acl_craft_pt) can identification.
+Using this framework, texts detected by [PyTorch-CRAFT](../Craft) can identification.
 
-<img alt="teaser" src="./figures/deep_text_reco.jpg">
+<img alt="teaser" src="./data/figures/deep_text_reco.jpg">
 
 ## Getting started
-Install dependencies;
-- opencv-python >= 3.4.2
-- functools
 
+Download following **None-ResNet-None-CTC PT model** from the link and put it in the _model_ folder. 
+
+| **Model** | **CANN Version** | **How to Obtain** |
+|---|---|---|
+| None-ResNet-None-CTC | 5.1.RC2  | Download pretrained model [None-ResNet-None-CTC](https://www.dropbox.com/sh/j3xmli4di1zuv3s/AAArdcPgz7UFxIHUuKNOeKv_a?dl=0)
+
+<details> <summary> Working on docker environment (<i>click to expand</i>)</summary>
+
+Start your docker environment.
+
+```bash
+sudo docker run -it -u root --rm --name mediapipeInfer -p 6565:4545 \
+--device=/dev/davinci0 \
+--device=/dev/davinci_manager \
+--device=/dev/devmm_svm \
+--device=/dev/hisi_hdc \
+-v /usr/local/dcmi:/usr/local/dcmi \
+-v /PATH/pyacl_samples:/workspace/pyacl_samples \
+-v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
+-v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
+ascendhub.huawei.com/public-ascendhub/infer-modelzoo:22.0.RC2 /bin/bash
 ```
-pip install -r requirements.txt
+
+```bash
+pip3 install --upgrade pip
+pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf scipy requests absl-py jupyter jupyterlab sympy
 ```
-And then download the `PT` file of from the link.
+
+```bash
+apt-get update && apt-get install -y --no-install-recommends \
+        gcc \
+        g++ \
+        make \
+        cmake \
+        zlib1g \
+        zlib1g-dev \
+        openssl \
+        libsqlite3-dev \
+        libssl-dev \
+        libffi-dev \
+        unzip \
+        pciutils \
+        net-tools \
+        libblas-dev \
+        gfortran \
+        libblas3 \
+        libopenblas-dev \
+        libbz2-dev \
+        build-essential \
+        git \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+```
+</details>
+
+## Convert Your Model
 
 ### PT model -> ONNX format -> Ascend om format
-#### PT -> ONNX
-Use in the original repository  the `model/onnx_export.py` the script to convert `PT` file to `ONNX ` file.
 
-#### ONNX -> OM
-And then use in the same directory atc tool to convert `ONNX ` file to `OM` file as as follows.
+For this stages it is recommended to use the docker environment to avoid affecting the development environment. The model_convert.sh file will do model conversion stage automatically. After conversion you should have the .onnx model in your /model path.
+
+```bash
+cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/DeepTextRecognition/model
+
+bash model_convert.sh
+```
+
 ```bash
 atc --model=None-ResNet-None-CTC.onnx \
     --framework=5 \
@@ -31,7 +87,23 @@ atc --model=None-ResNet-None-CTC.onnx \
     --soc_version=Ascend310
 ```
 
+Install dependencies;
+- opencv-python-headless
+- functools
+- numpy
+- Pillow
+
+```
+pip install -r requirements.txt
+```
+
 Finaly, open `jupyter-notebook` and run the code for demo
+
+```bash
+jupyter-notebook --port 4545 --ip 0.0.0.0 --no-browser --allow-root
+```
+
+Jupyter-notebook will open in (localhost):6565
 
 **Note :** Do not forget to give the boxes_path including the polygon coordinates detected by PyTorch-CRAFT for demo.
 

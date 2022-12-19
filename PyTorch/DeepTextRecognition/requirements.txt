@@ -1,2 +1,4 @@
-opencv-python
-scikit-image
+opencv-python-headless
+functools
+Pillow
+numpy

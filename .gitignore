@@ -24,3 +24,4 @@ build
 BlazeFace-PyTorch/
 output/
 insightface/
+results/*

@@ -9,7 +9,7 @@ MODIFIED: 2022-12-13 22:48:45
 import acl
 import cv2
 import numpy as np
-from postprocessing import PostProcess
+from src.postprocessing import PostProcess
 
 
 def get_size(model_desc):

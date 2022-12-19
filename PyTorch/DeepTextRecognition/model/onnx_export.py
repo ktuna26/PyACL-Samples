@@ -2,7 +2,7 @@
 Copyright 2021 Huawei Technologies Co., Ltd
 
 CREATED:  2020-11-15 08:12:13
-MODIFIED: 2021-11-17 16:35:45
+MODIFIED: 2022-12-19 4:35:45
 """
 
 # -*- coding:utf-8 -*-
@@ -12,6 +12,7 @@ import torch
 from model import Model
 from argparse import Namespace
 from collections import OrderedDict
+
 
 def copyStateDict(state_dict):
     new_state_dict = OrderedDict()
@@ -25,7 +26,7 @@ def copyStateDict(state_dict):
 opt = Namespace(imgH = 32, imgW = 100, num_fiducial = 20, input_channel = 1, output_channel = 512,
                 hidden_size = 256, num_class = 37, batch_max_length = 25, Transformation = None, 
                 FeatureExtraction = "ResNet", SequenceModeling = None, Prediction = "CTC",
-                gpu_enabled = False, saved_model = "./weights/None-ResNet-None-CTC.pt",
+                gpu_enabled = False, saved_model = "./None-ResNet-None-CTC.pth",
                 image_folder = "./result")
 
 # set model
@@ -43,7 +44,7 @@ x = torch.randn(1, opt.input_channel, opt.imgH, opt.imgW)
 model.eval()
 
 # get file name
-f = opt.saved_model.replace('.pt', '.onnx') 
+f = opt.saved_model.replace('.pth', '.onnx') 
 
 # trace export
 torch.onnx.export(model, x, f, export_params=True, verbose=False, opset_version=11,  

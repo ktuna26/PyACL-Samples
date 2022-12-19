@@ -1,19 +1,19 @@
 # InsightFace : SCRFD Face Detection
 
-Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https://onebox.huawei.com/p/d2bb0e04156ba1c43091f7d8946eb293) | [Paper](https://arxiv.org/abs/2105.04714) | [Original Github Repository](https://github.com/deepinsight/insightface/tree/master/detection/scrfd)
+Please open the `jupyter-notebook` for a quick demo | [Paper](https://arxiv.org/abs/2105.04714) | [Original Github Repository](https://github.com/deepinsight/insightface/tree/master/detection/scrfd)
 
 <div align="left">
-  <img src="./figures/insight_face.jpg" width="240" alt="prcurve"/>
+  <img src="./data/figures/insight_face.jpg" width="240" alt="prcurve"/>
 </div>
 
 ## Overview
 `SCRFD` is an efficient high accuracy face detection approach which 
 
-<img src="./figures/scrfd_evelope.jpg" width="400" alt="prcurve"/>
+<img src="./data/figures/scrfd_evelope.jpg" width="400" alt="prcurve"/>
 
 ## Getting started
 
-Download following **SCRFD PT model** from the link and put it in the model folder by changing its name as **scrfd_34g**. 
+Download following **SCRFD PT model** from the link and put it in the _model_ folder by changing its name as **scrfd_34g**. 
 
 | **Model** | **CANN Version** | **How to Obtain** |
 |---|---|---|
@@ -76,7 +76,7 @@ apt-get update && apt-get install -y --no-install-recommends \
 For this stages it is recommended to use the docker environment to avoid affecting the development environment. The model_convert.sh file will do model conversion stage automatically. After conversion you should have the .onnx model in your /model path.
 
 ```bash
-cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/acl_insight_face/model
+cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/InsightFace/model
 
 bash model_convert.sh
 ```
@@ -90,9 +90,9 @@ atc --model=scrfd_34g_shape640x640.onnx \
 ```
 
 Install dependencies;
-- opencv-python>=3.4.2
--  Pillow
+- opencv-python-headless
 - numpy
+- Pillow
 
 ```
 pip3 install -r requirements.txt
