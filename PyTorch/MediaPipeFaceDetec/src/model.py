@@ -35,10 +35,10 @@ def get_sizes(model_desc):
     return model_input_height,model_input_width
 
 
-def preprocessing(img_path,model_desc): # 1) pre-processing stage
+def preprocessing(org_img,model_desc):
     model_input_height, model_input_width = get_sizes(model_desc)
-    img_resized = resize(img_path[:, :, ::-1], (256, 256), 
-                            interpolation = INTER_AREA) # bgr to rgb (color space change) & resize
+    img_resized = resize(org_img[:, :, ::-1], (model_input_height, model_input_width), 
+                        interpolation = INTER_AREA) # bgr to rgb (color space change) & resize
     img_resized = img_resized.transpose(2, 0, 1)  # [h, w, c] to [c, h, w]
     print("[PreProc] img_resized shape", img_resized.shape)
 
@@ -47,4 +47,4 @@ def preprocessing(img_path,model_desc): # 1) pre-processing stage
     print("[PreProc] image_np_expanded shape", image_np_expanded.shape)
     image_np_expanded = np.ascontiguousarray(image_np_expanded)
     
-    return image_np_expanded, model_input_height, model_input_width
+    return image_np_expanded

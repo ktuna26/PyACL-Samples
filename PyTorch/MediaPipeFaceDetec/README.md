@@ -1,4 +1,5 @@
 # PyTorch Mediapipe Face Detection (BlazeFace)
+
 Please open the `jupyter-notebook` for a quick demo!
 
 BlazeFace is a fast, light-weight face detector from Google Research | [Read More](https://sites.google.com/view/perception-cv4arvr/blazeface) | [Paper](https://arxiv.org/abs/1907.05047)
@@ -35,7 +36,7 @@ ascendhub.huawei.com/public-ascendhub/infer-modelzoo:22.0.RC2 /bin/bash
 ```
 
 ```bash
-rm -rf /usr/local/python3.9.2
+rm -rf /usr/local/python3.9.2 # if your python version > 3.7.5
 
 wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz --no-check-certificate && \
     tar -zxvf Python-3.7.5.tgz && \
@@ -81,7 +82,7 @@ apt-get update && apt-get install -y --no-install-recommends \
 
 ### TFLite -> PT model -> ONNX format -> MindSpore .ckpt -> Mindspore .air -> Ascend .om format
 
-For this stages it is recommended to use the docker environment to avoid affecting the development environment. The model_convert.sh file will do every model conversion stage automatically. After conversion you should have the .air model in your /model path.
+For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_convert.sh` file will do every model conversion stage automatically. After conversion you should have the **.air** model in your `model` path.
 
 ```bash
 cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/MediapipeFaceDetec/model

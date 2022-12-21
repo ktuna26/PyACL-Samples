@@ -13,7 +13,7 @@ source convertTfliteOnnx/bin/activate
 
 # install necessary python libs
 pip3 install --upgrade pip
-pip3 install -r requierements.txt
+pip3 install -r requirements.txt
 
 # copy necessary file to repo
 cp -r onnx_export.py tflite_pthExport.py BlazeFace-PyTorch/

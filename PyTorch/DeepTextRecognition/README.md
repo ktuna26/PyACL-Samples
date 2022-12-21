@@ -72,7 +72,7 @@ apt-get update && apt-get install -y --no-install-recommends \
 
 ### PT model -> ONNX format -> Ascend om format
 
-For this stages it is recommended to use the docker environment to avoid affecting the development environment. The model_convert.sh file will do model conversion stage automatically. After conversion you should have the .onnx model in your /model path.
+For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_convert.sh` file will do model conversion stage automatically. After conversion you should have the **.onnx** model in your `model` path.
 
 ```bash
 cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/DeepTextRecognition/model

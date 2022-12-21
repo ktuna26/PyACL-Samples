@@ -1,3 +1,11 @@
+"""
+Copyright 2022 Huawei Technologies Co., Ltd
+
+CREATED:  2022-10-04 13:12:13
+MODIFIED: 2022-12-21 00:48:45
+"""
+
+# -*- coding:utf-8 -*-
 import torch
 from craft import CRAFT
 from collections import OrderedDict
@@ -14,10 +22,11 @@ def copyStateDict(state_dict):
         new_state_dict[name] = v
     return new_state_dict
 
+
 # load net
 net = CRAFT() # initialize
 
-net.load_state_dict(copyStateDict(torch.load('./weights/craft_mlt_25k.pth', map_location='cpu')))
+net.load_state_dict(copyStateDict(torch.load('craft_mlt_25k.pth', map_location='cpu')))
 net.eval()
 
 # load data
