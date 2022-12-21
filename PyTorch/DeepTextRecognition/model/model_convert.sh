@@ -12,7 +12,7 @@ python3 -m venv convertPt2Onnx
 source convertPt2Onnx/bin/activate
 
 # install necessary python libs
-pip3 install --upgrade pip
+python -m pip install --upgrade pip
 pip3 install -r requirements.txt
 
 # copy necessary file to repo

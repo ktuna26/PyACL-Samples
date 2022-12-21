@@ -25,3 +25,6 @@ BlazeFace-PyTorch/
 output/
 insightface/
 results/*
+*.zip
+*.tar
+*.rar

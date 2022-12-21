@@ -3,10 +3,6 @@
 # MODIFIED: 2022-12-14 22:48:45
 #!/bin/bash
 
-# clone necessary repository
-echo "Downloading CRAFT repository"
-git clone https://github.com/clovaai/CRAFT-pytorch
-
 # create python virtual environment
 python3 -m venv convertPt2Onnx
 source convertPt2Onnx/bin/activate
@@ -16,16 +12,20 @@ python -m pip install --upgrade pip
 pip3 install -r requirements.txt
 
 # copy necessary file to repo
-cp -r onnx_export.py craft_mlt_25k.pth CRAFT-pytorch
+cp -r yolov4.pth export/
+cp ../data/person.jpg export/
 
 # open repo
-cd CRAFT-pytorch
+cd export/
 
 # convert pt model to onnx model
-python3 onnx_export.py
+python3 onnx_export.py yolov4.pth person.jpg 80 608 608
 
 # mv onnx model
-mv craft.onnx ../
+mv yolov4.onnx ../
+
+# remove unnecessary files
+rm -r yolov4.pth person.jpg
 
 # deactivate venv
 deactivate
@@ -33,6 +33,4 @@ cd ../
 # delete virtual environment
 rm -r convertPt2Onnx
 
-# remove unnecessary files
-sudo rm -r CRAFT-pytorch/
 echo "[MODEL] Conversion Done!"

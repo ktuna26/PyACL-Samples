@@ -12,7 +12,7 @@ python3 -m venv convertTfliteOnnx
 source convertTfliteOnnx/bin/activate
 
 # install necessary python libs
-pip3 install --upgrade pip
+python -m pip install --upgrade pip
 pip3 install -r requirements.txt
 
 # copy necessary file to repo

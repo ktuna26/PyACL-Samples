@@ -10,7 +10,7 @@ import acl
 import numpy as np
 
 from cv2 import resize, INTER_AREA
-from src.postprocessing import PostProcess
+from src.postprocessing import scale_nms_reshape
 
 
 def get_sizes(model_desc):
@@ -39,7 +39,7 @@ def get_sizes(model_desc):
 
 def preprocessing(img_path,model_desc): # 1) pre-processing stage
     model_input_height, model_input_width = get_sizes(model_desc)
-    img_resized = resize(img_path[:, :, ::-1], (256, 256), 
+    img_resized = resize(img_path[:, :, ::-1], (model_input_height, model_input_width), 
                             interpolation = INTER_AREA) # bgr to rgb (color space change) & resize
     img_resized = img_resized.transpose(2, 0, 1)  # [h, w, c] to [c, h, w]
     print("[PreProc] img_resized shape", img_resized.shape)
@@ -47,14 +47,12 @@ def preprocessing(img_path,model_desc): # 1) pre-processing stage
     image_np_expanded = np.expand_dims(img_resized, axis=0)  # NCHW
     image_np_expanded = image_np_expanded.astype('float32') / 255.0 # Converts the image pixels to the range [-1, 1]
     print("[PreProc] image_np_expanded shape", image_np_expanded.shape)
-    image_np_expanded = np.ascontiguousarray(image_np_expanded)
+    # image_np_expanded = np.ascontiguousarray(image_np_expanded)
     
     return image_np_expanded, model_input_height, model_input_width
 
 
-def postprocessing(infer_output, origin_img, namesfile,model_desc):
-    boxes = post_processing(0.5, 0.6, infer_output)
+def postprocessing(output, img, conf_thresh=0.4, nms_thresh=0.45 ):
+    boxes = scale_nms_reshape(output, img, conf_thresh, nms_thresh)
 
-    class_names = load_class_names(namesfile)
-    plot_boxes_cv2(origin_img, boxes[0], 'predictions.jpg', class_names)
-    print("saved")
+    return boxes

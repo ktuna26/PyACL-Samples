@@ -6,7 +6,7 @@ Please open the `jupyter-notebook` for a quick demo | [Original Github Repositor
 
 `YOLOv4` is a one-stage object detection model that improves on YOLOv3 with several bags of tricks and modules introduced in the literature.
 
-<img src="./data/figures/predictions.jpg" width="400" alt="prcurve"/>
+<img src="./data/predictions.png" alt="prcurve"/>
 
 ## Getting started
 
