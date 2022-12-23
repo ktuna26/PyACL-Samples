@@ -2,10 +2,10 @@
 
 Please open the `jupyter-notebook` for a quick demo | [Original Github Repository (v6.1)](https://github.com/ultralytics/yolov5/tree/v6.1)
 
-<img alt="teaser" src="./data/predictions.png" width=416>
-
 ## Overview
 YOLOv5 🚀 is the world's most loved vision AI, incorporating lessons learned and best practices evolved over thousands of hours of research and development.
+
+<img alt="teaser" src="./data/predictions.png" width=416>
 
 ## Getting started
 
