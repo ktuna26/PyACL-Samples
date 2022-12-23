@@ -6,11 +6,11 @@ Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https:/
 
 `YOLOv4` is a one-stage object detection model that improves on YOLOv3 with several bags of tricks and modules introduced in the literature. This version developed by Huawei's AI framework Mindspore for best performance with Huawei Ascend NPU's in every stage.
 
-<img alt="teaser" src="./data/out_test.jpg" width=416>
+<img alt="teaser" src="./out/out_test.jpg" width=416>
 
 ## Getting Started
 
-Download appropriate **Yolov5 MS model** from the following link and put it in the _model_ folder. 
+Download appropriate **Yolov4 MS model** from the following link and put it in the _model_ folder. 
 
 | **Model** | **CANN Version** | **How to Obtain** |
 |---|---|---|

@@ -14,7 +14,7 @@ Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https:/
 
 ## Getting Started
 
-Download appropriate **Yolov5 MS model** from the following link and put it in the _model_ folder. 
+Download appropriate **DeepLabv3 MS model** from the following link and put it in the _model_ folder. 
 
 | **Model** | **CANN Version** | **How to Obtain** |
 |---|---|---|

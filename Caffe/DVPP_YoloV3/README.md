@@ -6,11 +6,11 @@ Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https:/
 
 `YOLOv3/v4` A real-time object detection framework of Yolov3/v4 based on Caffe. Before `YOLOv5`, `YOLOv3` was very popular and widely used repository. This version is DVPP version of `YOLOv3`. That means, preprocessing part is handling by Huawei Ascend.
 
-<img alt="teaser" src="./out/out_kite.jpg" width=416>
+<img alt="teaser" src="./out/out_kite.png" width=416>
 
 ## Getting Started
 
-Download appropriate **Yolov5 MS model** from the following link and put it in the _model_ folder. 
+Download appropriate **Yolov3 Caffe model** from the following link and put it in the _model_ folder. 
 
 | **Model** | **CANN Version** | **How to Obtain** |
 |---|---|---|
