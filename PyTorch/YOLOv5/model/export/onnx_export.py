@@ -3,7 +3,7 @@ Yolov5 ONNX Exporter
 Copyright 2022 Huawei Technologies Co., Ltd
 
 Requirements:
-    $ pip install -r requirements.txt  onnx onnx-simplifier onnxruntime  
+    $ pip install -r requirements.txt  onnx onnxruntime  
 
 Usage:
     $ python onnx_converter.py --weights yolov5s.pt 
@@ -14,7 +14,7 @@ CREATED:  2022-7-26 17:30:13
 import argparse, os, platform, sys, time, warnings,inspect,io ,torch, torch.nn as nn
 from pathlib import Path
 from typing import Optional
-from utils.utils import *
+import torch.nn as nn
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -24,11 +24,36 @@ if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 
-def export_onnx(model, im, file, opset, simplify, prefix=colorstr('ONNX:')):
+class Ensemble(nn.ModuleList):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x, augment=False, profile=False, visualize=False):
+        y = [module(x, augment, profile, visualize)[0] for module in self]
+        y = torch.cat(y, 1)  # nms ensemble
+        return y, None  # inference, train output
+    
+def attempt_load(weights, device=None, inplace=True, fuse=True):
+    model = Ensemble()
+    for w in weights if isinstance(weights, list) else [weights]:
+        ckpt = torch.load(w, map_location='cpu')  # load
+        ckpt = (ckpt.get('ema') or ckpt['model']).to(device).float()  # FP32 model
+        model.append(ckpt.fuse().eval() if fuse else ckpt.eval())  # fused or un-fused model in eval mode
+
+    if len(model) == 1:
+        return model[-1]  # return model
+    print(f'Ensemble created with {weights}\n')
+    for k in 'names', 'nc', 'yaml':
+        setattr(model, k, getattr(model[0], k))
+    model.stride = model[torch.argmax(torch.tensor([m.stride.max() for m in model])).int()].stride  # max stride
+    assert all(model[0].nc == m.nc for m in model), f'Models have different class counts: {[m.nc for m in model]}'
+    return model  # return ensemble
+    
+def export_onnx(model, im, file, opset):
     # YOLOv5 ONNX export
     try:
         import onnx
-        print(f'\n{prefix} starting export with onnx {onnx.__version__}...')
+        print(f'\nstarting export with onnx {onnx.__version__}...')
 
         f = file[0][:-3] + '.onnx'
         print(f'Path: {f}')
@@ -54,20 +79,10 @@ def export_onnx(model, im, file, opset, simplify, prefix=colorstr('ONNX:')):
             meta.key, meta.value = k, str(v)
         onnx.save(model_onnx, f)
 
-        # Simplify
-        if simplify:
-            try:
-                import onnxsim
-                print(f'{prefix} simplifying with onnx-simplifier {onnxsim.__version__}...')
-                model_onnx, check = onnxsim.simplify(model_onnx)
-                assert check, 'assert check failed'
-                onnx.save(model_onnx, f)
-            except Exception as e:
-                print(f'{prefix} simplifier failure: {e}')
-        print(f'{prefix} export success, saved as {f} ({file_size(f):.1f} MB)')
+        print(f'export success, saved as {f} ({file_size(f):.1f} MB)')
         return f
     except Exception as e:
-        print(f'{prefix} export failure: {e}')
+        print(f'export failure: {e}')
 
 
 @torch.no_grad()
@@ -78,7 +93,6 @@ def run(
         batch_size=1,  # batch size
         device='cpu',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         inplace=False,  # set YOLOv5 Detect() inplace=True
-        simplify=False,  # ONNX: simplify model
         opset=12,  # ONNX: opset version
 ):
     t = time.time()
@@ -99,7 +113,7 @@ def run(
     
     # Exports
     warnings.filterwarnings(action='ignore', category=torch.jit.TracerWarning)  # suppress TracerWarning
-    f = export_onnx(model, im, weights, opset, simplify)
+    f = export_onnx(model, im, weights, opset)
     # Finish
     print(f'\nExport complete ({time.time() - t:.2f}s)')
     print(f"\nResults saved!")
@@ -113,10 +127,8 @@ def parse_opt():
     parser.add_argument('--batch-size', type=int, default=1, help='batch size')
     parser.add_argument('--device', default='cpu', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--inplace', action='store_true', help='set YOLOv5 Detect() inplace=True')
-    parser.add_argument('--simplify', default= False ,action='store_true', help='ONNX: simplify model')
     parser.add_argument('--opset', type=int, default=12, help='ONNX: opset version. Currently, the ATC tool supports only opset_version=11.')
     opt = parser.parse_args()
-    print_args(vars(opt))
     return opt
 
 def main(opt):

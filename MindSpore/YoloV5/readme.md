@@ -1,4 +1,4 @@
-# Mindspore YOLOV5 Example
+# Mindspore YOLOv5 Example
 
 Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https://onebox.huawei.com/p/dad426ea028637e90fdef4f7a272e8cf) |[Original Repository](https://gitee.com/ktuna/mind-spore-yolov5/tree/master)
 
