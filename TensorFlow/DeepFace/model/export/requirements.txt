@@ -2,7 +2,6 @@ absl-py==1.2.0
 astor==0.8.1
 astunparse==1.6.3
 attrs==22.1.0
-auto-tune @ file:///root/selfgz2574011973/compiler/lib64/auto_tune-0.1.0-py3-none-any.whl
 beautifulsoup4==4.11.1
 cachetools==4.2.4
 certifi==2022.9.24
@@ -23,14 +22,11 @@ google-auth-oauthlib==0.4.6
 google-pasta==0.2.0
 grpcio==1.49.1
 h5py==2.10.0
-hccl @ file:///root/selfgz2574011973/compiler/lib64/hccl-0.1.0-py3-none-any.whl
-hccl-parser @ file:///usr/local/Ascend/ascend-toolkit/5.1.RC2/toolkit/tools/hccl_parser-0.1-py3-none-any.whl
 idna==3.4
 importlib-metadata==5.0.0
 itsdangerous==2.1.2
 Jinja2==3.1.2
 joblib==1.2.0
-Keras==2.1.6
 Keras-Applications==1.0.8
 Keras-Preprocessing==1.1.2
 keras2onnx==1.7.0
@@ -46,9 +42,6 @@ numpy==1.21.6
 oauthlib==3.2.1
 onnx==1.7.0
 onnxconverter-common==1.12.2
-op-gen @ file:///usr/local/Ascend/ascend-toolkit/5.1.RC2/toolkit/tools/op_gen-0.1-py3-none-any.whl
-op-test-frame @ file:///usr/local/Ascend/ascend-toolkit/5.1.RC2/toolkit/tools/op_test_frame-0.1-py3-none-any.whl
-opc-tool @ file:///root/selfgz2574011973/compiler/lib64/opc_tool-0.1.0-py3-none-any.whl
 opencv-contrib-python==4.6.0.66
 opencv-python==4.6.0.66
 opt-einsum==3.3.0
@@ -67,12 +60,10 @@ requests==2.28.1
 requests-oauthlib==1.3.1
 retina-face==0.0.12
 rsa==4.9
-schedule-search @ file:///root/selfgz2574011973/compiler/lib64/schedule_search-0.1.0-py3-none-any.whl
 scikit-learn==1.0.2
 scipy==1.4.1
 six==1.16.0
 soupsieve==2.3.2.post1
-te @ file:///root/selfgz2574011973/compiler/lib64/te-0.4.0-py3-none-any.whl
 tensorboard==1.15.0
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.1
@@ -81,7 +72,6 @@ tensorflow-estimator==1.15.1
 tensorflow-io-gcs-filesystem==0.27.0
 termcolor==2.0.1
 threadpoolctl==3.1.0
-topi @ file:///root/selfgz2574011973/compiler/lib64/topi-0.4.0-py3-none-any.whl
 tqdm==4.64.1
 typing_extensions==4.4.0
 urllib3==1.26.12
