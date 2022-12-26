@@ -21,7 +21,7 @@ Download appropriate **Yolov3 Caffe model** from the following link and put it i
 Start your docker environment.
 
 ```bash
-sudo docker run -it -u root --rm --name caffe_yolov3 -p 6565:4545 \
+sudo docker run -it -u root --rm --name yolov3 -p 6565:4545 \
 --device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \

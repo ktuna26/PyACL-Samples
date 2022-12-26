@@ -23,7 +23,7 @@ The BlazePaper paper mentions that there are two versions of the model, one for 
 Start your docker environment.
 
 ```bash
-sudo docker run -it -u root --rm --name mediapipeInfer -p 6565:4545 \
+sudo docker run -it -u root --rm --name media_pipe -p 6565:4545 \
 --device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \

@@ -24,7 +24,7 @@ Download following **SCRFD PT model** from the link and put it in the _model_ fo
 Start your docker environment.
 
 ```bash
-sudo docker run -it -u root --rm --name mediapipeInfer -p 6565:4545 \
+sudo docker run -it -u root --rm --name insight_face -p 6565:4545 \
 --device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
