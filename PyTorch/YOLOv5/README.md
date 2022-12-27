@@ -92,7 +92,7 @@ atc --model=yolov5s.onnx \
 Install dependencies;
 - opencv-python-headless
 - numpy
-- Pillowsudo
+- Pillow
 
 ```
 pip3 install -r requirements.txt
