@@ -86,6 +86,11 @@ atc --model=./yolov3.prototxt \
 ```
 
 Install dependencies;
+
+- numpy
+- opencv_python
+- Pillow
+
 ```
 pip3 install -r requirements.txt
 ```

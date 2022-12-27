@@ -89,6 +89,8 @@ atc --model=facenet_tf.pb \
 
 Install dependencies;
 
+- opencv-python-headless
+- numpy
 
 ```
 pip3 install -r requirements.txt

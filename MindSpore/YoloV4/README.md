@@ -85,6 +85,15 @@ atc --output=../model/yolov4_bs1 --soc_version=Ascend910 --framework=1 --model=.
 ```
 
 Install dependencies;
+
+- mindspore
+- mindspore_ascend
+- numpy
+- opencv_python
+- Pillow
+- PyYAML
+
+
 ```
 pip3 install -r requirements.txt
 ```

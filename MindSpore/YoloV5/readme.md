@@ -32,6 +32,7 @@ sudo docker run -it -u root --rm --name mindspore_yolov5_infer -p 6565:4545 \
 -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 ascendhub.huawei.com/public-ascendhub/infer-modelzoo:22.0.RC2 /bin/bash
 ```
+    
 ```bash
 pip3 install --upgrade pip
 pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf scipy requests absl-py jupyter jupyterlab sympy
@@ -68,14 +69,19 @@ apt-get update && apt-get install -y --no-install-recommends \
 ## Convert Your Model
 
 ### Model conversion from .air to .om with ATC:
-    ```bash
-    # Model conversion ascend310
-    atc --output=./yolov5s_ms --soc_version=Ascend310 --framework=1 --model=./deneme_320_s_yolov5s.air
-    # Model conversion ascend910
-    atc --output=./yolov5s_ms --soc_version=Ascend910 --framework=1 --model=./deneme_320_s_yolov5s.air
-    ```
+
+```bash
+# Model conversion ascend310
+atc --output=./yolov5s_ms --soc_version=Ascend310 --framework=1 --model=./deneme_320_s_yolov5s.air
+# Model conversion ascend910
+atc --output=./yolov5s_ms --soc_version=Ascend910 --framework=1 --model=./deneme_320_s_yolov5s.air
+```
 
 Install dependencies;
+
+- pandas
+- numpy
+- Pillow
 
 ```
 pip3 install -r requirements.txt

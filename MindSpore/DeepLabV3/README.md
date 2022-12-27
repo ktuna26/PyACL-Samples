@@ -83,6 +83,11 @@ atc --output=./deeplab_513 --soc_version=Ascend910 --framework=1 --model=./deepl
 
 
 Install dependencies;
+
+- matplotlib
+- numpy
+- opencv_python
+
 ```
 pip3 install -r requirements.txt
 ```
