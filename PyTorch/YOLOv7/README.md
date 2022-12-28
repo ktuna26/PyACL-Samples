@@ -1,5 +1,5 @@
 # Pytorch YOLOv7 Object Detection
-Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7.pt) | [Paper](https://arxiv.org/abs/2207.02696) | [Original Github Repository](https://github.com/WongKinYiu/yolov7)
+Please open the `jupyter-notebook` for a quick demo | [Paper](https://arxiv.org/abs/2207.02696) | [Original Github Repository](https://github.com/WongKinYiu/yolov7)
 
 ## Overview
 YOLOv7 surpasses all known object detectors in both speed and accuracy in the range from 5 FPS to 160 FPS and has the highest accuracy 56.8% AP among all known real-time object detectors with 30 FPS or higher on GPU V100. YOLOv7-E6 object detector (56 FPS V100, 55.9% AP) outperforms both transformer-based detector SWIN-L Cascade-Mask R-CNN (9.2 FPS A100, 53.9% AP) by 509% in speed and 2% in accuracy, and convolutional-based detector ConvNeXt-XL Cascade-Mask R-CNN (8.6 FPS A100, 55.2% AP) by 551% in speed and 0.7% AP in accuracy, as well as YOLOv7 outperforms: YOLOR, YOLOX, Scaled-YOLOv4, YOLOv5, DETR, Deformable DETR, DINO-5scale-R50, ViT-Adapter-B and many other object detectors in speed and accuracy. 
@@ -78,7 +78,7 @@ pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf sc
 
 ## Convert Your Model
 
-#### PB model -> ONNX format -> Ascend .om format
+#### PT model -> ONNX format -> Ascend .om format
 For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_convert.sh` file will do every model conversion stage automatically. After conversion you should have the `.onnx` model in your model path. If you want to change model input sizes you need to customize `model_convert.sh` file.
 
 ```bash

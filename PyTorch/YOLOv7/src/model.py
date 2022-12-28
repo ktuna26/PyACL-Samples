@@ -7,8 +7,7 @@ MODIFIED: 2022-12-27 16:37:32
 # -*- coding:utf-8 -*-
 import acl
 import numpy as np
-
-from cv2 import resize, INTER_AREA, INTER_LINEAR
+from cv2 import resize, INTER_LINEAR
 from src.postprocess import non_max_suppression, scale_coords
 
 def get_sizes(model_desc):

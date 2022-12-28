@@ -1,3 +1,11 @@
+"""
+Copyright 2022 Huawei Technologies Co., Ltd
+
+CREATED:  2020-12-19 20:12:13
+MODIFIED: 2022-12-28 15:48:45
+"""
+
+# -*- coding:utf-8 -*-
 import os
 import tensorflow as tf
 import numpy as np

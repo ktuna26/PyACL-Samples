@@ -4,7 +4,8 @@ Copyright 2022 Huawei Technologies Co., Ltd
 CREATED:  2022-12-22 13:12:13
 MODIFIED: 2022-12-27 16:48:45
 """
-import cv2
+
+# -*- coding:utf-8 -*-
 import numpy as np
 import time
 

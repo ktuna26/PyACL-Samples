@@ -1,3 +1,11 @@
+"""
+Copyright 2022 Huawei Technologies Co., Ltd
+
+CREATED:  2020-12-19 20:12:13
+MODIFIED: 2022-12-28 15:48:45
+"""
+
+# -*- coding:utf-8 -*-
 import tensorflow as tf
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 import time

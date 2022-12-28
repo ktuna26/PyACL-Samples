@@ -5,15 +5,27 @@ CREATED:  2022-10-04 13:12:13
 MODIFIED: 2022-12-26 10:48:45
 """
 
-
-
+# -*- coding:utf-8 -*-
 import acl
 import cv2
-import sys
-sys.path.append('../acllite')
-from acllite_model import AclLiteModel
-from acllite_resource import AclLiteResource
 import numpy as np
+
+def get_sizes(model_desc):
+    input_size = acl.mdl.get_num_inputs(model_desc)
+    output_size = acl.mdl.get_num_outputs(model_desc)
+    print("model input size", input_size)
+    for i in range(input_size):
+        print("input ", i)
+        print("model input dims", acl.mdl.get_input_dims(model_desc, i))
+        print("model input datatype", acl.mdl.get_input_data_type(model_desc, i))
+    print("=" * 50)
+    print("model output size", output_size)
+    for i in range(output_size):
+            print("output ", i)
+            print("model output dims", acl.mdl.get_output_dims(model_desc, i))
+            print("model output datatype", acl.mdl.get_output_data_type(model_desc, i))
+    print("=" * 50)
+    print("[Model] class Model init resource stage success")
 
 
 def resize_image(img, size):
@@ -43,7 +55,8 @@ def resize_image(img, size):
 
     return cv2.resize(mask, size, interpolation)
 
-def preprocess(img):
+def preprocessing(img,model_desc):
+    get_sizes(model_desc)
     img_resized =  resize_image(img,(160, 160))[:, :, ::-1]
     img_resized = img_resized.transpose(2, 0, 1)  # BGR to RGB, to 3x640x640
 
@@ -51,19 +64,3 @@ def preprocess(img):
     image_np_expanded = np.expand_dims(image_np, axis=0)  # NCHW
     return image_np_expanded
 
-def get_sizes(model_desc):
-    input_size = acl.mdl.get_num_inputs(model_desc)
-    output_size = acl.mdl.get_num_outputs(model_desc)
-    print("model input size", input_size)
-    for i in range(input_size):
-        print("input ", i)
-        print("model input dims", acl.mdl.get_input_dims(model_desc, i))
-        print("model input datatype", acl.mdl.get_input_data_type(model_desc, i))
-    print("=" * 50)
-    print("model output size", output_size)
-    for i in range(output_size):
-            print("output ", i)
-            print("model output dims", acl.mdl.get_output_dims(model_desc, i))
-            print("model output datatype", acl.mdl.get_output_data_type(model_desc, i))
-    print("=" * 50)
-    print("[Model] class Model init resource stage success")
