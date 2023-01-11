@@ -1,21 +1,17 @@
 """
 Copyright 2021 Huawei Technologies Co., Ltd
 
-CREATED:  2022-23-11 13:12:13
-MODIFIED: 2022-21-12 10:48:45
+CREATED:  2022-11-23 13:12:13
+MODIFIED: 2023-01-09 10:48:45
 """
 
 # -*- coding:utf-8 -*-
 import numpy as np
-import os
 import cv2
 import matplotlib as mpl
 import matplotlib.colors as mplc
 import matplotlib.figure as mplf
 import matplotlib.image as mpi
-
-def postprocess(result_list, pic, output_dir):
-    draw_label(pic, result_list[0].squeeze(), output_dir)
     
     
 _COLORS = np.array([
@@ -45,7 +41,6 @@ _COLORS = np.array([
 ]).astype(np.float32).reshape(-1, 3)
 
 
-# fmt: on
 def random_color(rgb=False, maximum=255):
     """
     Args:
@@ -136,7 +131,7 @@ def draw_sem_seg(ax, segments, img_shape, default_font_size):
             ax.add_patch(polygon)
 
 
-def draw_segment(segments, img_path, label_img_dir):
+def draw_segment(segments, img_path):
     img = mpi.imread(img_path)
     segments = np.array(segments)
     img_height, img_width = img.shape[0], img.shape[1]
@@ -150,33 +145,26 @@ def draw_segment(segments, img_path, label_img_dir):
     default_font_size = max(np.sqrt(img_width * img_height) // 90, 10)
     img_shape = (img_height, img_width)
     draw_sem_seg(ax, segments, img_shape, default_font_size)
+    return fig
 
-    _, file_name = os.path.split(img_path)
-    label_path = os.path.join(label_img_dir, file_name)
-    fig.savefig(label_path)
-
-
-def draw_label(img_file, mask_pred, label_img_dir):
+def draw_label(img_file, mask_pred):
     segments = list()
     img = cv2.imread(img_file)
-    #get img shape
     img_h, img_w = img.shape[:2]
     mask_pred = mask_pred > 0.5
     mask_pred = mask_pred * 255
     mask_pred = mask_pred.astype("uint8")
     for i in range(1,21):
-
         if np.any(mask_pred[i][...] > 200):
             mask_pred_ = mask_pred[i, :, :]
             
             im_mask = cv2.resize(mask_pred_, (img_w, img_h))
 
             dilate_mask_pic = "./mask/pic" + str(i) +".jpg"
-            print(dilate_mask_pic,"dilate_mask_pic")
             cv2.imwrite(dilate_mask_pic, im_mask) 
             segments.append(im_mask)
         
-    draw_segment(segments, img_file, label_img_dir)
-    print('Image saved out path.')
+    fig = draw_segment(segments, img_file)
+    return fig
 
 

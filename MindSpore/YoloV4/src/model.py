@@ -8,48 +8,45 @@ MODIFIED: 2022-22-12 11:18:45
 # -*- coding:utf-8 -*-
 import numpy as np
 import acl
-import cv2 as cv
 from PIL import Image
-from src.postprocess import get_sizes
+from src.postprocessing import letterbox, non_max_suppression
+
+def get_sizes(model_desc, returnType):
+    input_size = acl.mdl.get_num_inputs(model_desc)
+    output_size = acl.mdl.get_num_outputs(model_desc)
+    if returnType:
+        print("model input size", input_size)
+        for i in range(input_size):
+            print("input ", i)
+            print("model input dims", acl.mdl.get_input_dims(model_desc, i))
+            print("model input datatype", acl.mdl.get_input_data_type(model_desc, i))
+            model_input_height, model_input_width = acl.mdl.get_input_dims(model_desc, i)[0]['dims'][2:]
+        print("=" * 50)
+        print("model output size", output_size)
+        for i in range(output_size):
+                print("output ", i)
+                print("model output dims", acl.mdl.get_output_dims(model_desc, i))
+                print("model output datatype", acl.mdl.get_output_data_type(model_desc, i))
+                model_output_height, model_output_width = acl.mdl.get_output_dims(model_desc, i)[0]['dims'][1:3]
+        print("=" * 50)
+        print("[Model] class Model init resource stage success")
+        return model_input_height,model_input_width
+    else:
+        for i in range(input_size):
+            model_input_height, model_input_width = acl.mdl.get_input_dims(model_desc, i)[0]['dims'][2:]
+        return model_input_height, model_input_width
 
 
-# CONSTANTS
-class_num = 80
-stride_list = [32, 16, 8]
-anchors_3 = np.array([[12, 16], [19, 36], [40, 28]]) / stride_list[2]
-anchors_2 = np.array([[36, 75], [76, 55], [72, 146]]) / stride_list[1]
-anchors_1 = np.array([[142, 110], [192, 243], [459, 401]]) / stride_list[0]
-anchor_list = [anchors_1, anchors_2, anchors_3]
-iou_threshold = 0.9
+def preprocessing(img, model_desc):
+    model_input_height, model_input_width = get_sizes(model_desc, True)
+    image_org = Image.fromarray(img)
+    image = letterbox(image_org, model_input_height, model_input_width)
+    image = image.astype(np.float32)
+    image = image / 255
+    image = image.transpose(2, 0, 1).copy()
+    return image, image_org
 
-with open("./data/coco.names") as fd:
-    coco_labels = fd.readlines()
-
-labels = [i[:-1] for i in coco_labels][1:]
-
-
-def preprocess(img_path, model_desc):
-    MODEL_HEIGHT, MODEL_WIDTH = get_sizes(model_desc, True)
-    image = Image.open(img_path)
-    img_h = image.size[1]
-    img_w = image.size[0]
-    net_h = MODEL_HEIGHT
-    net_w = MODEL_WIDTH
-
-    scale = min(float(net_w) / float(img_w), float(net_h) / float(img_h))
-    new_w = int(img_w * scale)
-    new_h = int(img_h * scale)
-
-    shift_x = (net_w - new_w) // 2
-    shift_y = (net_h - new_h) // 2
-    shift_x_ratio = (net_w - new_w) / 2.0 / net_w
-    shift_y_ratio = (net_h - new_h) / 2.0 / net_h
-
-    image_ = image.resize((new_w, new_h))
-    new_image = np.zeros((net_h, net_w, 3), np.uint8)
-    new_image[shift_y: new_h + shift_y, shift_x: new_w + shift_x, :] = np.array(image_)
-    new_image = new_image.astype(np.float32)
-    new_image = new_image / 255
-    print('new_image.shape', new_image.shape)
-    new_image = new_image.transpose(2, 0, 1).copy()
-    return new_image, image
+def postprocessing(infer_output, origin_img, labels, model_desc):
+    model_input_height, model_input_width = get_sizes(model_desc, False)
+    result_return = non_max_suppression(infer_output, origin_img, model_input_width, model_input_height, labels)   
+    return result_return

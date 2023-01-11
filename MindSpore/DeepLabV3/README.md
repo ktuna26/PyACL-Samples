@@ -1,6 +1,6 @@
-# MindSpore Deeplabv3
+# MindSpore DeepLabv3
 
-Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/deeplabv3/deeplabv3_origin.air) |[Original Github Repository](https://github.com/open-mmlab/mmsegmentation)
+Please open the `jupyter-notebook` for a quick demo |[Original Github Repository](https://github.com/open-mmlab/mmsegmentation)
 
 
 
@@ -9,16 +9,16 @@ Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https:/
 `DeepLabv3` is a semantic segmentation architecture that improves upon DeepLabv2 with several modifications. To handle the problem of segmenting objects at multiple scales, modules are designed which employ atrous convolution in cascade or in parallel to capture multi-scale context by adopting multiple atrous rates. 
 
 
-<img alt="teaser" src="./out/test.jpg" width=416>
+<img alt="teaser" src="../../Common/data/deeplabv3_result.jpg" width=416>
 
 
 ## Getting Started
 
-Download appropriate **DeepLabv3 MS model** from the following link and put it in the _model_ folder. 
+Download appropriate **DeepLabv3 model** from the following link and put it in the _model_ folder. 
 
 | **Model** | **CANN Version** | **How to Obtain** |
 |---|---|---|
-| DeepLabv3 | 5.1.RC2 | [Pretrained Model](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/deeplabv3/deeplabv3_origin.air) |
+| DeepLabv3 | 5.1.RC2 | Download pretrained model [DeepLabv3](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/deeplabv3/deeplabv3_origin.air) |
 
 
 <details> <summary> Work on docker environment (<i>click to expand</i>)</summary>
@@ -26,7 +26,7 @@ Download appropriate **DeepLabv3 MS model** from the following link and put it i
 Start your docker environment.
 
 ```bash
-sudo docker run -it -u root --rm --name mindspore_deeplabv3_infer -p 6565:4545 \
+sudo docker run -it -u root --rm --name mindspore_deeplabv3 -p 6565:4545 \
 --device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
@@ -37,6 +37,7 @@ sudo docker run -it -u root --rm --name mindspore_deeplabv3_infer -p 6565:4545 \
 -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 ascendhub.huawei.com/public-ascendhub/infer-modelzoo:22.0.RC2 /bin/bash
 ```
+    
 ```bash
 pip3 install --upgrade pip
 pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf scipy requests absl-py jupyter jupyterlab sympy
@@ -73,12 +74,14 @@ apt-get update && apt-get install -y --no-install-recommends \
 
 ## Convert Your Model
 
-## Converting .AIR format -> .OM format:
+## AIR format -> OM format:
+For this stages it is recommended to use the docker environment to avoid affecting the development environment. After downloading the pretrained model, you should have the `.air` model in your `model` path. Below atc commmand will do model conversion stage from `.air` to `.om` automatically.
+
 ```bash
-# Model conversion ascend310
-atc --output=./deeplab_513 --soc_version=Ascend310 --framework=1 --model=./deeplabv3_origin.air
-# Model conversion ascend910
-atc --output=./deeplab_513 --soc_version=Ascend910 --framework=1 --model=./deeplabv3_origin.air
+atc --model=deeplabv3_origin.air \
+    --framework=1 \
+    --output=deeplab_513 \
+    --soc_version=Ascend310
 ```
 
 

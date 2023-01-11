@@ -1,27 +1,27 @@
-# Mindspore YOLOV4 Example
+# Mindspore YOLOv4 Example
 
-Please open the `jupyter-notebook` for a quick demo | [Pretrained Model](https://www.mindspore.cn/resources/hub/details/en?MindSpore/1.8/yolov4_coco2017) |[Original Github Repository](https://github.com/AlexeyAB/darknet)| [Paper](https://arxiv.org/abs/2004.10934)
+Please open the `jupyter-notebook` for a quick demo | [Original Github Repository](https://github.com/AlexeyAB/darknet)| [Paper](https://arxiv.org/abs/2004.10934)
 
 ## Overview
 
 `YOLOv4` is a one-stage object detection model that improves on YOLOv3 with several bags of tricks and modules introduced in the literature. This version developed by Huawei's AI framework Mindspore for best performance with Huawei Ascend NPU's in every stage.
 
-<img alt="teaser" src="./out/out_test.jpg" width=416>
+<img alt="teaser" src="../../Common/data/yolo_prediction_result.jpg" width=416>
 
 ## Getting Started
 
-Download appropriate **Yolov4 MS model** from the following link and put it in the _model_ folder. 
+Download appropriate **YOLOv4 model** from the following link and put it in the _model_ folder. 
 
 | **Model** | **CANN Version** | **How to Obtain** |
 |---|---|---|
-| YOLOv4 | 5.1.RC2 | [Pretrained .air Model](https://www.mindspore.cn/resources/hub/details/en?MindSpore/1.8/yolov4_coco2017) |
+| YOLOv4 | 5.1.RC2 | Download pretrained model [YOLOv4](https://www.mindspore.cn/resources/hub/details/en?MindSpore/1.8/yolov4_coco2017) |
 
 <details> <summary> Work on docker environment (<i>click to expand</i>)</summary>
 
 Start your docker environment.
 
 ```bash
-sudo docker run -it -u root --rm --name mindspore_yolov4_infer -p 6565:4545 \
+sudo docker run -it -u root --rm --name mindspore_yolov4 -p 6565:4545 \
 --device=/dev/davinci0 \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
@@ -68,30 +68,28 @@ apt-get update && apt-get install -y --no-install-recommends \
 
 ## Convert Your Model
 
-## PT model -> ONNX format -> Ascend om format
+## CKPT model -> AIR format -> Ascend OM format
 
-For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `convert.sh` file will do every model conversion stage automatically. After conversion you should have the **.onnx** model in your `model` path.
+For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_convert.sh` file will do every model conversion stage automatically. After conversion you should have the `.air` model in your model path. If you want to change model input sizes you need to customize `model_convert.sh` file.
 
 ```bash
-bash convertmodel.sh
+cd <root_path_of_pyacl_samples>/pyacl_samples/MindSpore/YoloV4/model
+bash model_convert.sh
 ```
-### ONNX model -> .OM format  (AIR -> OM)
+### AIR model -> OM format 
 
 ```bash
-# Model conversion ascend310
-atc --output=../model/yolov4_bs1 --soc_version=Ascend310 --framework=1 --model=./yolov4_latest.air
-# Model conversion ascend910
-atc --output=../model/yolov4_bs1 --soc_version=Ascend910 --framework=1 --model=./yolov4_latest.air
+atc --model=yolov4.air \
+    --framework=1 \
+    --output=yolov4 \
+    --soc_version=Ascend310  
 ```
 
 Install dependencies;
 
-- mindspore
-- mindspore_ascend
 - numpy
 - opencv_python
 - Pillow
-- PyYAML
 
 
 ```

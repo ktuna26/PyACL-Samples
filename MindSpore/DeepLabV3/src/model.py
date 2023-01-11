@@ -9,6 +9,7 @@ MODIFIED: 2022-21-12 10:48:45
 import cv2
 import numpy as np
 import acl
+from src.postprocessing import draw_label
 
 
 def get_sizes(model_desc):
@@ -33,7 +34,7 @@ def get_sizes(model_desc):
     return model_input_height,model_input_width
 
 
-def preprocess(picPath,model_desc):
+def preprocessing(picPath,model_desc):
     model_input_height,model_input_width = get_sizes(model_desc)
     bgr_img_ = cv2.imread(picPath).astype(np.uint8)
 
@@ -48,3 +49,8 @@ def preprocess(picPath,model_desc):
     img[:, :, 2] = img[:, :, 2] / 58.395
     img = img.transpose([2, 0, 1]).copy()
     return img
+
+
+def postprocessing(result_list, pic):
+    result = draw_label(pic, result_list[0].squeeze())
+    return result

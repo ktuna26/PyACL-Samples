@@ -1,28 +1,18 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ============================================================================
+"""
+Copyright 2021 Huawei Technologies Co., Ltd
+
+CREATED:  2022-10-04 13:12:13
+MODIFIED: 2022-12-28 10:48:45
+"""
+
+# -*- coding:utf-8 -*-
 import os
 import numpy as np
-
-import mindspore
-from mindspore import context, Tensor
+from mindspore import context, Tensor, float32
 from mindspore.train.serialization import export, load_checkpoint, load_param_into_net
-
-from yolo_utils.yolo import YOLOV4CspDarkNet53
-
-from model_utils.config import config
-from model_utils.moxing_adapter import moxing_wrapper
+from utils.yolo import YOLOV4CspDarkNet53
+from model.config import config
+from model.moxing_adapter import moxing_wrapper
 
 
 def modelarts_pre_process():
@@ -43,7 +33,7 @@ def run_export():
     param_dict = load_checkpoint(config.ckpt_file)
     load_param_into_net(network, param_dict)
 
-    input_data = Tensor(np.zeros([config.batch_size, 3, ts_shape, ts_shape]), mindspore.float32)
+    input_data = Tensor(np.zeros([config.batch_size, 3, ts_shape, ts_shape]),float32)
 
     export(network, input_data, file_name=config.file_name, file_format=config.file_format)
 
