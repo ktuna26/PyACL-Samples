@@ -29,7 +29,6 @@ def get_sizes(model_desc):
 
 
 def resize_image(img, size):
-
     h, w = img.shape[:2]
     c = img.shape[2] if len(img.shape)>2 else 1
 
@@ -54,6 +53,7 @@ def resize_image(img, size):
         mask[y_pos:y_pos+h, x_pos:x_pos+w, :] = img[:h, :w, :]
 
     return cv2.resize(mask, size, interpolation)
+
 
 def preprocessing(img,model_desc):
     get_sizes(model_desc)

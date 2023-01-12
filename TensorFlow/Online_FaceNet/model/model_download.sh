@@ -3,7 +3,7 @@
 # MODIFIED: 2022-12-23 11:37:18
 #!/bin/bash
 
-echo "[MODEL] Model is Downloading"
+echo "[MODEL] Download Started!"
 # Get model from Huawei modelzoo
 wget https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/Facenet_for_ACL.zip --no-check-certificate
 
@@ -13,8 +13,7 @@ unzip Facenet_for_ACL.zip
 # Copy tensorflow model weights to /model folder
 cp ./Facenet_for_ACL/facenet_tf.pb .
 
-rm -r ./Facenet_for_ACL
+# Remove unnecessary files and folders.
+rm -r Facenet_for_ACL Facenet_for_ACL.zip
 
-rm Facenet_for_ACL.zip
-
-echo "[MODEL] Model is Downloaded!"
+echo "[MODEL] Download Complated!"

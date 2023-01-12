@@ -6,10 +6,8 @@ MODIFIED: 2023-01-04 03:05:21
 """
 import cv2
 import numpy as np
-import scipy
 import math
-import matplotlib
-import matplotlib.cm
+from matplotlib.cm import get_cmap 
 from scipy.ndimage.filters import gaussian_filter
 
 # find connection in the specified sequence, center 29 is in the position 15
@@ -25,7 +23,8 @@ colors = [[255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 255, 0], [170, 255, 0]
           [0, 255, 85], [0, 255, 170], [0, 255, 255], [0, 170, 255], [0, 85, 255], [0, 0, 255], [85, 0, 255], \
           [170, 0, 255], [255, 0, 255], [255, 0, 170], [255, 0, 85]]
 
-cmap = matplotlib.cm.get_cmap('hsv')
+cmap = get_cmap('hsv')
+
 
 def getOutputs(result_list,oriImg,data,pad):
     stride = 8
@@ -39,9 +38,8 @@ def getOutputs(result_list,oriImg,data,pad):
     paf = cv2.resize(paf, (0,0), fx=stride, fy=stride, interpolation=cv2.INTER_CUBIC)
     paf = paf[:data.shape[0]-pad[2], :data.shape[1]-pad[3], :]
     paf = cv2.resize(paf, (oriImg.shape[1], oriImg.shape[0]), interpolation=cv2.INTER_CUBIC)
-    
-    
     return heatmap, paf
+
 
 def calculatePeaks(heatmap):
     all_peaks = []
@@ -70,8 +68,8 @@ def calculatePeaks(heatmap):
         peak_counter += len(peaks)
     return all_peaks
 
+
 def findConnections(paf,all_peaks,oriImg):
-    
     connection_all = []
     special_k = []
     mid_num = 10
@@ -114,13 +112,13 @@ def findConnections(paf,all_peaks,oriImg):
                     connection = np.vstack([connection, [candA[i][3], candB[j][3], s, i, j]])
                     if(len(connection) >= min(nA, nB)):
                         break
-
             connection_all.append(connection)
         else:
             special_k.append(k)
             connection_all.append([])
     return connection_all, special_k
             
+    
 def findSubset(connection_all,all_peaks,special_k):
     subset = -1 * np.ones((0, 20))
     candidate = np.array([item for sublist in all_peaks for item in sublist])
@@ -173,6 +171,7 @@ def findSubset(connection_all,all_peaks,special_k):
             deleteIdx.append(i)
     subset = np.delete(subset, deleteIdx, axis=0)
     return subset,candidate
+
 
 def drawHumans(subset,canvas,candidate):
     stickwidth = 1

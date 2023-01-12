@@ -8,7 +8,7 @@ import acl
 import cv2
 import numpy as np
 from src.util import padRightDownCorner
-
+from src.postprocessing import getOutputs, calculatePeaks, findConnections, findSubset, drawHumans
 
 def get_sizes(model_desc):
     input_size = acl.mdl.get_num_inputs(model_desc)
@@ -30,11 +30,25 @@ def get_sizes(model_desc):
     print("[Model] class Model init resource stage success")
     return model_input_height,model_input_width
 
+
 def preprocessing(img_path,model_desc):
+    model_input_height, model_input_width = get_sizes(model_desc)
     imageToTest = cv2.resize(img_path, (0,0), fx=1, fy=1, interpolation=cv2.INTER_CUBIC)
     imageToTest_padded, pad = padRightDownCorner(imageToTest, 8, 128)
-    model_input_height, model_input_width = get_sizes(model_desc)
     img_resized = cv2.resize(imageToTest_padded, (model_input_width, model_input_height))[:, :, ::-1]
     img_resized = img_resized.astype(np.float32)
-    
-    return img_resized,pad, model_input_height, model_input_width
+    return img_resized,pad
+
+
+def postprocessing(result_list,img_org_bgr,data,pad):
+    # Seperate outputs as heatmap and Part Affinity Fields
+    heatmap, paf = getOutputs(result_list,img_org_bgr,data,pad)
+    # Calculate peaks
+    all_peaks = calculatePeaks(heatmap)
+    # Find connections 
+    connection_all, special_k = findConnections(paf, all_peaks, img_org_bgr)
+    # Find subset value for visualizing outputs
+    subset, candidate= findSubset(connection_all, all_peaks, special_k)
+    # Draw outputs
+    canvas = drawHumans(subset,img_org_bgr,candidate)
+    return canvas

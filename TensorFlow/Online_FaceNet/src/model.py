@@ -10,7 +10,7 @@ import tensorflow as tf
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 import time
 import numpy as np
-import npu_bridge
+
 
 class Model(object):
 
@@ -59,10 +59,9 @@ class Model(object):
 
         with tf.Graph().as_default() as graph:
             tf.import_graph_def(graph_def, name="")
-
         return graph
 
-    def inference(self, batch_data):
+    def execute(self, batch_data):
         """
         do infer
         :param image_data:
@@ -104,18 +103,10 @@ class Model(object):
             # Define the Minis that can be divided into several batches
             mini_batch.append(image_data[i: i + batch_size, :, :, :])
             i += batch_size
-
         return mini_batch
 
-def run_model(model, images):
+def execute(model, images):
     batch_images = model.batch_process(images)
-    
-    # ###start inference
-    print("######## NOW Start inference!!! #########")
-    batch_output, batch_time = model.inference(batch_images)
-
-    print("######## Inference Finished!!! #########")
-    print("Record %d batch intervals" % (len(batch_time)))
-    print("In total spent", batch_time)
-    
+    # start inference
+    batch_output, batch_time = model.execute(batch_images)
     return batch_output, batch_time

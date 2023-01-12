@@ -9,7 +9,7 @@ YOLOv3 is one of the fast, light-weight real-time object detection system and mo
 ## Overview
 `TensorFlow` implementation for **YOLOv3** (You Only Look Once, Version 3) is a **real-time object detection algorithm** that detects objects in images, videos or  live streams. The YOLO machine learning algorithm build by Deep Convolutional Neural Networks to detect an object. 
 
-<img src="./data/prediction.png" height="250" alt="prcurve"/>
+<img alt="teaser" src="../../Common/data/yolov4_result.jpg" width=416>
 
 
 ## Getting started
@@ -81,16 +81,15 @@ apt-get update && apt-get install -y --no-install-recommends \
 ## Convert Your Model
 
 ## PB model -> Ascend OM format
-
-For this stages it is recommended to use the docker environment to avoid affecting the development environment. After downloading the pretrained model, you should have the **.pb** model in your `model` path. Below atc commmand will do model conversion stage from **.pb** to **.om** automatically.
+For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_download.sh` file will download the pretrained model automatically. After downloading, the `.pb` model will be in model directory.
 
 ```bash
 cd <root_path_of_pyacl_samples>/pyacl_samples/TensorFlow/YoloV3/model
+bash model_download.sh
 ```
 
 ```bash
-cd ./model
-atc --model=yolov3.pb \
+atc --model=yolov3_int8_tf.pb \
     --framework=3 \
     --input_shape="input/input_data:1,416,416,3" \
     --output=./yolov3 \

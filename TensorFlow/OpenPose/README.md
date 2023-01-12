@@ -76,12 +76,12 @@ pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf sc
 
 ## Convert Your Model
 
-#### PB model -> Ascend .om format
-For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_convert.sh` file will do every stage automatically. After conversion you should have the `.pb` model in your model path.
+#### PB model -> Ascend OM format
+For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_download.sh` file will download the pretrained model automatically. After downloading, the `.pb` model will be in model directory.
 
 ```bash
 cd <root_path_of_pyacl_samples>/pyacl_samples/TensorFlow/OpenPose/model
-bash model_convert.sh
+bash model_download.sh
 ```
 
 ```bash
