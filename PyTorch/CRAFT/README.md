@@ -1,12 +1,12 @@
 # PyTorch CRAFT: Character-Region Awareness For Text detection
 
-Please open the `jupyter-notebook` for a quick demo | [Paper](https://arxiv.org/abs/1904.01941) | [Original Github Repository](https://github.com/clovaai/CRAFT-pytorch)
+Please open the `jupyter-notebook` for a quick demo | [Paper](https://arxiv.org/abs/1904.01941) | [Original Github Repository](https://github.com/clovaai/CRAFT-pytorch)|
 
 ## Overview
 
 `PyTorch` implementation for **CRAFT** text detector that effectively detect text area by exploring each character region and affinity between characters. The bounding box of texts are obtained by simply finding minimum bounding rectangles on binary map after thresholding character region and affinity scores.
 
-<img width="1000" alt="teaser" src="./data/figures/craft_example.gif">
+<img width="1000" alt="teaser" src=".../../Common/data/figures/craft_example.gif">
 
 ## Getting started
 
@@ -27,16 +27,12 @@ sudo docker run -it -u root --rm --name craft -p 6565:4545 \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
 -v /usr/local/dcmi:/usr/local/dcmi \
--v /PATH/pyacl_samples:/workspace/pyacl_samples \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
 -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
+-v /PATH/pyacl_samples:/workspace/pyacl_samples \
 ascendhub.huawei.com/public-ascendhub/infer-modelzoo:22.0.RC2 /bin/bash
 ```
-
-```bash
-pip3 install --upgrade pip
-pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf scipy requests absl-py jupyter jupyterlab sympy
-```
+    
 ```bash
 apt-get update && apt-get install -y --no-install-recommends \
         gcc \
@@ -63,6 +59,24 @@ apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 ```
+
+```bash
+rm -rf /usr/local/python3.9.2
+
+wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz --no-check-certificate && \
+    tar -zxvf Python-3.7.5.tgz && \
+    cd Python-3.7.5 && \
+    ./configure --prefix=/usr/local/python3.7.5 --enable-loadable-sqlite-extensions --enable-shared && make -j && make install && \
+    cd .. && \
+    rm -r -d Python-3.7.5 && rm Python-3.7.5.tgz && \
+    export LD_LIBRARY_PATH=/usr/local/python3.7.5/lib:$LD_LIBRARY_PATH && \
+    export PATH=/usr/local/python3.7.5/bin:$PATH
+
+pip3 install --upgrade pip
+pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf scipy requests absl-py jupyter jupyterlab sympy
+
+```
+
 </details>
 
 ## Convert Your Model
@@ -70,6 +84,11 @@ apt-get update && apt-get install -y --no-install-recommends \
 ### PT model -> ONNX format -> Ascend om format
 
 For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_convert.sh` file will do model conversion stage automatically. After conversion you should have the **.onnx** model in your `model` path.
+
+```bash
+cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/CRAFT/model
+bash model_convert.sh
+```
 
 ```bash
 atc --model=craft.onnx \

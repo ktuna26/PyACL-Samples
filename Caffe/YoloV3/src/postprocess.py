@@ -9,10 +9,10 @@ MODIFIED: 2022-21-12 09:48:45
 import cv2
 import os
 
-with open("./data/coco.names") as fd:
+with open("../../Common/data/coco.names") as fd:
     coco_labels = fd.readlines()
 
-labels = [i[:-1] for i in coco_labels][1:]
+labels = [i[:-1] for i in coco_labels][0:]
 
 MODEL_WIDTH = 416
 MODEL_HEIGHT = 416
@@ -27,12 +27,6 @@ def post_process(infer_output, bgr_img, image_file,model_name="yolov3"):
    
     scalex = bgr_img.shape[1] / MODEL_WIDTH
     scaley = bgr_img.shape[0] / MODEL_HEIGHT
-
-    
-    if not os.path.exists('./out'):
-        os.makedirs('./out')
-    output_path = os.path.join("./out", os.path.basename(image_file))
-    print("image file = ", image_file)
     
     for n in range(int(box_num)):
         ids = int(box_info[5 * int(box_num) + n]) 
@@ -49,9 +43,5 @@ def post_process(infer_output, bgr_img, image_file,model_name="yolov3"):
                 (int(bottom_right_x), int(bottom_right_y)), colors[n % 6])
         p3 = (max(int(top_left_x), 15), max(int(top_left_y), 15))
         cv2.putText(bgr_img, label, p3, cv2.FONT_ITALIC, 0.6, colors[n % 6], 1)
-
-    output_file = os.path.join("./out", "out_" + os.path.basename(image_file))
-    print("output:%s" % output_file)
-    cv2.imwrite(output_file, bgr_img)
-    print("success!")
+        
     return bgr_img

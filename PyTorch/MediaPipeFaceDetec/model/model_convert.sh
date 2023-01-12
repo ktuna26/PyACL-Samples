@@ -8,12 +8,14 @@ echo "Downloading BlazeFace repository"
 git clone https://github.com/hollance/BlazeFace-PyTorch.git
 
 # create python virtual environment
+echo "[ENV] Virtual Environment Preparation Starting!"
 python3 -m venv convertTfliteOnnx
 source convertTfliteOnnx/bin/activate
 
 # install necessary python libs
 python -m pip install --upgrade pip
 pip3 install -r requirements.txt
+echo "[ENV] Virtual Environment Preparation Done!"
 
 # copy necessary file to repo
 cp -r onnx_export.py tflite_pthExport.py BlazeFace-PyTorch/
@@ -24,6 +26,7 @@ cd BlazeFace-PyTorch/
 wget https://github.com/google/mediapipe/raw/v0.7.12/mediapipe/models/face_detection_back.tflite --no-check-certificate
 
 # convert tf-lite model to pt model
+echo "[MODEL] Conversion Starting!"
 python3 tflite_pthExport.py
 # convert pt model to onnx model
 python3 onnx_export.py
@@ -58,5 +61,5 @@ python3 ms_export.py
 # move the air model to model folder
 mv air_blazeface_back.air ../
 # remove unnecessary files
-sudo rm -r BlazeFace-PyTorch/ output/ blazefaceback.onnx
+rm -r BlazeFace-PyTorch/ output/ blazefaceback.onnx
 echo "[MODEL] Conversion Done!"

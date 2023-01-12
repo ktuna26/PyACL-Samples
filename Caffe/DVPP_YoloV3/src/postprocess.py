@@ -7,10 +7,10 @@ MODIFIED: 2022-21-12 09:28:45
 
 # -*- coding:utf-8 -*-
 
-with open("./data/coco.names") as fd:
+with open("../../Common/data/coco.names") as fd:
     coco_labels = fd.readlines()
 
-labels = [i[:-1] for i in coco_labels][1:]
+labels = [i[:-1] for i in coco_labels][0:]
 
 def post_processing(result_list):
     all_detections = []

@@ -139,7 +139,7 @@ def draw_sem_seg(ax, segments, img_shape, default_font_size):
             ax.add_patch(polygon)
 
 
-def draw_segment(segments, org_img, label_path):
+def draw_segment(segments, org_img):
     rgb_img = org_img[:, :, ::-1]
     segments = np.array(segments)
     img_height, img_width = rgb_img.shape[0], rgb_img.shape[1]
@@ -153,8 +153,6 @@ def draw_segment(segments, org_img, label_path):
     default_font_size = max(np.sqrt(img_width * img_height) // 90, 10)
     img_shape = (img_height, img_width)
     draw_sem_seg(ax, segments, img_shape, default_font_size)
-    fig.savefig(label_path)
-    print('Image saved into output path . . .')
 
     return fig
 
@@ -165,7 +163,7 @@ def softmax(x):
     return e_x / e_x.sum(axis=0) # 
 
 
-def draw_label(org_img, mask_pred, label_path):
+def draw_label(org_img, mask_pred):
     #get img shape
     img_h, img_w = org_img.shape[:2]
 
@@ -183,5 +181,5 @@ def draw_label(org_img, mask_pred, label_path):
             im_mask = cv2.resize(mask_pred_, (img_w, img_h))
             segments.append(im_mask)
         
-    return draw_segment(segments, org_img, label_path)
+    return draw_segment(segments, org_img)
     

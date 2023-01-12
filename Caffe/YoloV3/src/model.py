@@ -12,10 +12,10 @@ import cv2
 import os
 
 
-with open("./data/coco.names") as fd:
+with open("../../Common/data/coco.names") as fd:
     coco_labels = fd.readlines()
 
-labels = [i[:-1] for i in coco_labels][1:]
+labels = [i[:-1] for i in coco_labels][0:]
 
 MODEL_WIDTH = 416
 MODEL_HEIGHT = 416

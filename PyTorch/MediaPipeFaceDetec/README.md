@@ -4,13 +4,13 @@ Please open the `jupyter-notebook` for a quick demo!
 
 BlazeFace is a fast, light-weight face detector from Google Research | [Read More](https://sites.google.com/view/perception-cv4arvr/blazeface) | [Paper](https://arxiv.org/abs/1907.05047)
 
-<img alt="teaser" src="./data/figures/mediapipe_small.png">
+<img alt="teaser" src="../../Common/data/figures/mediapipe_small.png">
 
 ## Overview
 `PyTorch` implementation for **Mediapipe** face detector that effectively detect face area by exploring 6 keypoints (2x eyes, 2x ears, nose, mouth) for face landmarks.
 The BlazePaper paper mentions that there are two versions of the model, one for the front-facing camera and one for the back-facing camera. This repo includes only the backend camera model
 
-<img alt="teaser" src="./data/figures/face_detection_android_gpu.gif">
+<img alt="teaser" src="../../Common/data/figures/face_detection_android_gpu.gif">
 
 ## Getting started
 
@@ -29,27 +29,12 @@ sudo docker run -it -u root --rm --name media_pipe -p 6565:4545 \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
 -v /usr/local/dcmi:/usr/local/dcmi \
--v /PATH/pyacl_samples:/workspace/pyacl_samples \
 -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
 -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
+-v /PATH/pyacl_samples:/workspace/pyacl_samples \
 ascendhub.huawei.com/public-ascendhub/infer-modelzoo:22.0.RC2 /bin/bash
 ```
-
-```bash
-rm -rf /usr/local/python3.9.2 # if your python version > 3.7.5
-
-wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz --no-check-certificate && \
-    tar -zxvf Python-3.7.5.tgz && \
-    cd Python-3.7.5 && \
-    ./configure --prefix=/usr/local/python3.7.5 --enable-loadable-sqlite-extensions --enable-shared && make -j && make install && \
-    cd .. && \
-    rm -r -d Python-3.7.5 && rm Python-3.7.5.tgz && \
-    export LD_LIBRARY_PATH=/usr/local/python3.7.5/lib:$LD_LIBRARY_PATH && \
-    export PATH=/usr/local/python3.7.5/bin:$PATH
-
-pip3 install --upgrade pip
-pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf scipy requests absl-py jupyter jupyterlab sympy
-```
+    
 ```bash
 apt-get update && apt-get install -y --no-install-recommends \
         gcc \
@@ -71,10 +56,29 @@ apt-get update && apt-get install -y --no-install-recommends \
         libopenblas-dev \
         libbz2-dev \
         build-essential \
+        lzma \
+        liblzma-dev \
         git \
         && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+```
+    
+```bash
+rm -rf /usr/local/python3.9.2
+
+wget https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz --no-check-certificate && \
+    tar -zxvf Python-3.7.5.tgz && \
+    cd Python-3.7.5 && \
+    ./configure --prefix=/usr/local/python3.7.5 --enable-loadable-sqlite-extensions --enable-shared && make -j && make install && \
+    cd .. && \
+    rm -r -d Python-3.7.5 && rm Python-3.7.5.tgz && \
+    export LD_LIBRARY_PATH=/usr/local/python3.7.5/lib:$LD_LIBRARY_PATH && \
+    export PATH=/usr/local/python3.7.5/bin:$PATH
+
+pip3 install --upgrade pip
+pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf scipy requests absl-py jupyter jupyterlab sympy
+
 ```
 </details>
 

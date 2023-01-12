@@ -6,9 +6,8 @@
 # yolov5 model type (s,m,x) 
 pt_model=$1
 
-echo "[LOG] Process begin, please wait..."
-
 # create python virtual environment
+echo "[ENV] Virtual Environment Preparation Starting!"
 python3 -m venv convertPt2Onnx
 source convertPt2Onnx/bin/activate
 
@@ -19,15 +18,16 @@ cp ${pt_model} export/
 cd export/
 
 # install necessary python libs
-pip3 install --upgrade pip --quiet
-pip3 install -r requirements.txt --quiet
+pip3 install --upgrade pip 
+pip3 install -r requirements.txt 
 
-echo "[LOG] Conversion environment created."
+echo "[ENV] Virtual Environment Preparation Done!"
 
 python -m pip install --upgrade pip
 pip3 install -r requirements.txt
 
 # convert pt model to onnx model
+echo "[MODEL] Conversion Starting!"
 python3 onnx_export.py --weights ${pt_model}
 
 # mv onnx model
@@ -39,4 +39,4 @@ cd ../
 # delete virtual environment
 rm -r convertPt2Onnx
 
-echo "[MODEL] Conversion from Pytorch to ONNX is Done!"
+echo "[MODEL] Conversion Done!"
