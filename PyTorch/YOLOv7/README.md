@@ -82,7 +82,7 @@ pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf sc
 For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_convert.sh` file will do every model conversion stage automatically. After conversion you should have the `.onnx` model in your model path. If you want to change model input sizes you need to customize `model_convert.sh` file.
 
 ```bash
-cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/MediapipeFaceDetec/model
+cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/YOLOv7/model
 bash model_convert.sh
 ```
 

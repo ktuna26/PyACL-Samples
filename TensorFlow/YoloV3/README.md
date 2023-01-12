@@ -9,7 +9,7 @@ YOLOv3 is one of the fast, light-weight real-time object detection system and mo
 ## Overview
 `TensorFlow` implementation for **YOLOv3** (You Only Look Once, Version 3) is a **real-time object detection algorithm** that detects objects in images, videos or  live streams. The YOLO machine learning algorithm build by Deep Convolutional Neural Networks to detect an object. 
 
-<img alt="teaser" src="../../Common/data/yolov4_result.jpg" width=416>
+<img alt="teaser" src="../../Common/data/yolov4_result.png" width=416>
 
 
 ## Getting started

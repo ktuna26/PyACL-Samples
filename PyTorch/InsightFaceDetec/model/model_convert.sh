@@ -25,14 +25,14 @@ echo "[ENV] Virtual Environment Preparation Done!"
 
 # copy necessary file to repo
 cp -r onnx_export.py scrfd_34g.py scrfd_34g.pth insightface/detection/scrfd
-cp ../data/test.jpg insightface/detection/scrfd
+cp ../../../Common/data/peoples.jpg insightface/detection/scrfd
 
 # open repo
 cd insightface/detection/scrfd
 
 # convert pt model to onnx model
 echo "[MODEL] Conversion Starting!"
-python3 onnx_export.py --config scrfd_34g.py --weights scrfd_34g.pth --input_img test.jpg --simplify
+python3 onnx_export.py --config scrfd_34g.py --weights scrfd_34g.pth --input_img peoples.jpg --simplify
 
 # mv onnx model
 mv scrfd_34g_shape640x640.onnx ../../../

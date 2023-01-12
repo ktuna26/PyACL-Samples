@@ -6,7 +6,7 @@ Please open the `jupyter-notebook` for a quick demo | [Paper](https://arxiv.org/
 
 `PyTorch` implementation for **CRAFT** text detector that effectively detect text area by exploring each character region and affinity between characters. The bounding box of texts are obtained by simply finding minimum bounding rectangles on binary map after thresholding character region and affinity scores.
 
-<img width="1000" alt="teaser" src=".../../Common/data/figures/craft_example.gif">
+<img width="1000" alt="teaser" src="../../Common/data/figures/craft_example.gif">
 
 ## Getting started
 
