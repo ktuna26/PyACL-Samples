@@ -1,12 +1,14 @@
-# Mindspore YOLOv4 Example
+# MindSpore YOLOv4 Example
 
 Please open the `jupyter-notebook` for a quick demo | [Original Github Repository](https://github.com/AlexeyAB/darknet)| [Paper](https://arxiv.org/abs/2004.10934)
+
+<img src="https://pjreddie.com/media/image/yologo_2.png" height="200" alt="prcurve"/>
 
 ## Overview
 
 `YOLOv4` is a one-stage object detection model that improves on YOLOv3 with several bags of tricks and modules introduced in the literature. This version developed by Huawei's AI framework Mindspore for best performance with Huawei Ascend NPU's in every stage.
 
-<img alt="teaser" src="../../Common/data/yolo_prediction_result.jpg" width=416>
+<img src="../../Common/data/yolo_result.png" alt="prcurve"/>
 
 ## Getting Started
 

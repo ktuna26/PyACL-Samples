@@ -1,4 +1,4 @@
-# Tensorflow YOLOv3 Object Detection
+# TensorFlow YOLOv3 Object Detection
 Please open the `jupyter notebook` for a quick demo.
 
 YOLOv3 is one of the fast, light-weight real-time object detection system and models pretrained on the COCO dataset. | [Read More](https://pjreddie.com/darknet/yolo/) | [Paper](https://arxiv.org/abs/1804.02767) | [Original Github Repository](https://gitee.com/link?target=https%3A%2F%2Fgithub.com%2FYunYang1994%2Ftensorflow-yolov3)
@@ -9,7 +9,7 @@ YOLOv3 is one of the fast, light-weight real-time object detection system and mo
 ## Overview
 `TensorFlow` implementation for **YOLOv3** (You Only Look Once, Version 3) is a **real-time object detection algorithm** that detects objects in images, videos or  live streams. The YOLO machine learning algorithm build by Deep Convolutional Neural Networks to detect an object. 
 
-<img alt="teaser" src="../../Common/data/yolov4_result.png" width=416>
+<img src="../../Common/data/yolo_result.png" alt="prcurve"/>
 
 
 ## Getting started

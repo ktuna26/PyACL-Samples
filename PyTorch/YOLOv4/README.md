@@ -2,15 +2,17 @@
 
 Please open the `jupyter-notebook` for a quick demo | [Original Github Repository](https://github.com/Tianxiaomo/pytorch-YOLOv4)
 
+<img src="https://pjreddie.com/media/image/yologo_2.png" height="200" alt="prcurve"/>
+
 ## Overview
 
 `YOLOv4` is a one-stage object detection model that improves on YOLOv3 with several bags of tricks and modules introduced in the literature.
 
-<img src="../../Common/data/yolov4_result.png" alt="prcurve"/>
+<img src="../../Common/data/yolo_result.png" alt="prcurve"/>
 
 ## Getting started
 
-Download following **Yolov4 PTH model** from the link and put it in the _model_ folder. 
+Download following **YOLOv4 model** from the link and put it in the _model_ folder. 
 
 | **Model** | **CANN Version** | **How to Obtain** |
 |---|---|---|

@@ -1,19 +1,23 @@
-# YoloV3 Object Detection with DVPP
+# Caffe YOLOv3 Object Detection with DVPP
 
 Please open the `jupyter-notebook` for a quick demo |[Original Github Repository](https://github.com/ChenYingpeng/caffe-yolov3)|
 
+<img src="https://pjreddie.com/media/image/yologo_2.png" height="200" alt="prcurve"/>
 
 ## Overview
 
-`YOLOv3/v4` A real-time object detection framework of Yolov3/v4 based on Caffe. Before `YOLOv5`, `YOLOv3` was very popular and widely used repository.
+`YOLOv3` A real-time object detection framework of YOLOv3 based on Caffe. Before `YOLOv5`, `YOLOv3` was very popular and widely used repository.
+
+<img src="../../Common/data/yolo_result.png" alt="prcurve"/>
+
 
 ## Getting Started
 
-Download appropriate **Yolov3 Caffe model** from the following link and put it in the _model_ folder. 
+Download appropriate **YOLOv3 model** from the following link and put it in the _model_ folder. 
 
 | **Model** | **CANN Version** | **How to Obtain** |
 |---|---|---|
-| YOLOv3 | 5.1.RC2 | Download pretrained model [Yolov3](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/Yolov3/yolov3.caffemodel) |
+| YOLOv3 | 5.1.RC2 | Download pretrained model [YOLOv3](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/Yolov3/yolov3.caffemodel) |
 
 
 <details> <summary> Work on docker environment (<i>click to expand</i>)</summary>
@@ -83,12 +87,12 @@ pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf sc
 
 ## Convert Your Model
 
-#### Converting .caffe format -> .OM format:
-For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_convert.sh` file will do model downloading stage automatically. After you should have the `.caffe` model in your model path. 
+#### CAFFE model -> Ascend OM format
+For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_download.sh` file will do model downloading stage automatically. After you should have the `.caffe` model in your model path. 
 
 ```bash
 cd <root_path_of_pyacl_samples>/pyacl_samples/Caffe/DVPP_YoloV3/model
-bash model_convert.sh
+bash model_download.sh
 ```
 
 ```bash

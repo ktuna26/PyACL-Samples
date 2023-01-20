@@ -1,12 +1,14 @@
-# Mindspore YOLOv5 Example
+# MindSpore YOLOv5 Example
 
 Please open the `jupyter-notebook` for a quick demo |[Original Repository](https://gitee.com/ktuna/mind-spore-yolov5/tree/master)
+
+<img src="https://pjreddie.com/media/image/yologo_2.png" height="200" alt="prcurve"/>
 
 ## Overview
 
 YOLOv5 is one of the most popular object detecion AI, incorporating lessons learned and best practices evolved over thousands of hours of research and development. This version developed by Huawei's AI framework Mindspore for best performance with Huawei Ascend NPU's in every stage.
 
-<img alt="teaser" src="../../Common/data/yolo_prediction_result.jpg" width=416>
+<img src="../../Common/data/yolo_result.png" alt="prcurve"/>
 
 ## Getting Started
 

@@ -1,19 +1,21 @@
-# PyTorch YoloV5 Object Detection
+# PyTorch YOLOv5 Object Detection
 
 Please open the `jupyter-notebook` for a quick demo | [Original Github Repository (v6.1)](https://github.com/ultralytics/yolov5/tree/v6.1)
 
-## Overview
-YOLOv5 🚀 is the world's most loved vision AI, incorporating lessons learned and best practices evolved over thousands of hours of research and development.
+<img src="https://pjreddie.com/media/image/yologo_2.png" height="200" alt="prcurve"/>
 
-<img alt="teaser" src="../../Common/data/yolov4_result.png" width=416>
+## Overview
+YOLOv5 🚀 is the world's most loved vision AI for now, incorporating lessons learned and best practices evolved over thousands of hours of research and development.
+
+<img src="../../Common/data/yolo_result.png" alt="prcurve"/>
 
 ## Getting started
 
-Download appropriate **Yolov5 PT model** from the following link and put it in the _model_ folder. 
+Download appropriate **YOLOv5 model** from the following link and put it in the _model_ folder. 
 
 | **Model** | **CANN Version** | **How to Obtain** |
 |---|---|---|
-| Yolo5 | 5.1.RC2  | Download pretrained model [Yolo5 Models](https://github.com/ultralytics/yolov5/releases/tag/v6.1)
+| Yolo5 | 5.1.RC2  | Download pretrained model [YOLOv5](https://github.com/ultralytics/yolov5/releases/tag/v6.1)
 
 <details> <summary> Work on docker environment (<i>click to expand</i>)</summary>
 
@@ -81,13 +83,12 @@ pip3 install attrs numpy decorator sympy cffi pyyaml pathlib2 psutil protobuf sc
 
 ## Convert Your Model
 
-## PT model -> ONNX format -> Ascend om format
+## PT model -> ONNX format -> Ascend OM format
 
 For this stages it is recommended to use the docker environment to avoid affecting the development environment. The `model_convert.sh` file will do every model conversion stage automatically. After conversion you should have the **.onnx** model in your `model` path.
 
 ```bash
 cd <root_path_of_pyacl_samples>/pyacl_samples/PyTorch/YOLOv5/model
-
 bash model_convert.sh <yolov5_model_name.pt>
 ```
 

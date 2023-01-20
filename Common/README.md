@@ -6,3 +6,4 @@ This directory is the python public code directory, the directory structure and 
 | directory  | description  |
 |---|---|
 | [acllite](./acllite)  | The acllite public library encapsulates the relevant repetitive code in the current open source community samples and provides a set of simple public interfaces for users.  |
+| [data](./data) | Common data files used in projects such as images, videos, labels etc. |
