@@ -7,9 +7,7 @@ kernel_meta
 *.bin
 .ipynb_checkpoints
 build
-*.jpg
-*.png
-*.gif
+#*.jpg
 *.h264
 *.h265
 *.caffemodel
